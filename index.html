@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Timer App</title>
+        <link rel="stylesheet" href="./styles.css" />
+    </head>
+    <body>
+        <header>
+            <h1>Timer App</h1>
+            <p>Create and run multiple timers in a single app.</p>
+        </header>
+        <main>
+            <section class="options">
+                <!-- <div>
+                    <button id="subtract-btn">-</button>
+                    <input id="number-input" type="number" value="1" min="1"/>
+                    <button id="add-btn">+</button>
+                </div> -->
+                <div>
+                    <p>Default Start Time</p>
+                    <!-- logic for adding to minutes if seconds go over 59s, same for hour, etc. -->
+                    <label for="hour">Hour:
+                        <input id="hour" type="number" value="0" min="0" max="24"/>
+                    </label>
+
+                    <label for="minute">Minute:
+                        <input id="minute" type="number" value="0" min="0" max="59"/>
+                    </label>
+
+                    <label for="second">Second
+                        <input id="second" type="number" value="0" min="0" max="59"/>
+                    </label>
+                </div>
+                <button id="new-btn">Add New</button>
+            </section>
+            <section class="timers">
+
+            </section>
+        </main>
+    </body>
+    <script src="./scripts.js"></script>
+</html>

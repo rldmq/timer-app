@@ -1,0 +1,13 @@
+-start all
+-stop all
+-pause all
+
+-clicking on pause again should start the timer again
+    -alternatively, once a timer is paused, the pause button should become disabled, and user should press start again to continue
+
+-store timers in local storage
+    -this will eventually move to firebase
+
+Issues:
+-ID of the timers (currently going by count)
+-adding a new timer while existing timers are running pauses the existing timers
