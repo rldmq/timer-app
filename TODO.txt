@@ -9,5 +9,7 @@
     -this will eventually move to firebase
 
 Issues:
--ID of the timers (currently going by count)
 -adding a new timer while existing timers are running pauses the existing timers
+
+Refactor:
+instead of queryselectorall[0], simply change to query selector

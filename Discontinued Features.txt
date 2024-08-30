@@ -1,0 +1,1 @@
+1. Option setting how many timers to add (eg: add 5 new timers upon clicking the add button).

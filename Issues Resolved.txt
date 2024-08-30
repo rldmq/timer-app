@@ -1,0 +1,28 @@
+1. How to handle timer display and logic when counting down?
+Initially, I was grabbing the values from the timer element (hours, minutes, seconds) then using IF statements along with setInterval to create logic for the countdown.
+
+Eg: SetInterval will reduce the "seconds" by 1 per second, but if "minutes" or "hours" is greater than 0, "seconds" will go back to 59 seconds.
+
+setInterval(()=>{
+    if(secondsEl.innerHTML === "0"){
+
+        if(minutesEl.innerHTML !== "0" || hoursEl.innerHTML !== "0"){
+            secondsEl.innerHTML = "59"
+        }else{
+            secondsEl.innerHTML = Number(secondsEl.innerHTML)-1
+        }
+    }
+},1000)
+
+This was fine initially, but the complexity of the IF statements increased once minutes and hours were being calculated.
+
+The solution I came up with was to calculate the total time in seconds and simply decrement that total by 1 per second.  Then, the number being decremented is used by the display by using Math.floor/timescale (hours, minutes)
+
+2. How to handle STOP and PAUSE when the setInterval is handled by the START function?
+My initial approach was to completely replace the timer element on the page with a copy using CLONE.  There were a few issues with this, but the main issue is that the setInterval is still running even with the element completely removed (which is obvious now, but not at the time)
+
+After some searching, people recommended using a global variable to store the setInterval.  I ended up using an object to store the setInterval, using the timer ID as the key to be used for clearInterval.
+
+3. How to handle looping the timer? (+issues that popped up)
+-implementing loop exposed an issue with the timer, it ias adding an extra second due to how the display works (setinterval ran every second, so the display is delayed)
+-above issue is fixed  by converting to miliseconds and decreasing 10ms every 10ms (setinterval's minimum delay is 10ms)
