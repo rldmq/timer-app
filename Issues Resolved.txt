@@ -24,5 +24,13 @@ My initial approach was to completely replace the timer element on the page with
 After some searching, people recommended using a global variable to store the setInterval.  I ended up using an object to store the setInterval, using the timer ID as the key to be used for clearInterval.
 
 3. How to handle looping the timer? (+issues that popped up)
--implementing loop exposed an issue with the timer, it ias adding an extra second due to how the display works (setinterval ran every second, so the display is delayed)
--above issue is fixed  by converting to miliseconds and decreasing 10ms every 10ms (setinterval's minimum delay is 10ms)
+My approch to this was to use an IF statement to determine what the button will do if the timer is active and if the timer is inactive.
+
+If the timer is inactive, simply run the handleStartButton function with loop enabled.
+
+If the timer is active, clear the setInterval for that timer and create a new one that starts with the remaining time, then loops back to the original time.
+
+This button was the most complex to handle, since it exposed issues with the timer and due to the number of circumstances to test out.
+
+The main issue that I came across with the timer was that it was adding an extra second when the timer is looping.  This is because the setInterval initially ran every second.  This issue was fixed by changing the setInterval to run every 10ms (the minimum delay).
+

@@ -1,32 +1,166 @@
 /* 
+    FONTS
+*/
+@font-face{
+    font-family: digital-clock;
+    src: url("../assets/fonts/LCD14.otf") format("opentype");
+}
+
+/* 
     GLOBAL
 */
 *{
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: Inter, sans-serif;
+    font-size: 1rem;
     /* border: 1px solid red; */
+}
+
+/* 
+    TYPOGRAPHY
+*/
+h1{
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+h2{
+    font-weight: normal;
+}
+
+.clock{
+    font-family: "digital-clock";
+    font-size: 3rem;
+}
+
+.timers--timer-el--countdown-container span{
+    font-family: "digital-clock";
+    font-size: 4rem;
+}
+
+span.text-small{
+    font-size: 1.5rem;
+}
+
+/* .start-btn,
+.pause-btn,
+.reset-btn,
+.loop-btn,
+.delete-btn{
+    
+} */
+
+/* 
+    APP
+*/
+body{
+    padding: 2em;
+
+}
+
+main{
+    margin-top: 1em;
 }
 
 /* 
     OPTIONS
 */
-button{
-    padding: 1em;
+
+/* For Chrome */
+input[type=number]::-webkit-inner-spin-button{
+    opacity: 1;
+}
+
+.options--timer-settings{
+    margin-top: 0.5em;
+    display: grid;
+    grid: 1fr/ repeat(4, 6em);
+}
+
+.options--timer-settings--display input{
+    border: 1px solid lightgrey;
+    padding: 0.1em;
+    width: 2em;
+}
+
+input.options--timer-settings--display--clock-hour{
+    border-right: none;
+    border-top-left-radius: 0.2em;
+    border-bottom-left-radius: 0.2em;
+}
+input.options--timer-settings--display--clock-minute{
+    border-left: none;
+    border-right: none;
+}
+input.options--timer-settings--display--clock-second{
+    border-left:none;
+    border-top-right-radius: 0.2em;
+    border-bottom-right-radius: 0.2em;
+}
+
+#new-btn{
+    margin: 0 0.5em;
+    border: 1px solid grey;
+    border-radius: 0.5em;
+}
+
+#new-btn:hover{
+    background: lightgrey;
+}
+
+#new-btn:active{
+    transform: translate(1px, 1px)
 }
 
 /* 
     TIMERS
 */
-.timer{
-    border: 1px solid grey;
+.timers{
+    margin-top: 1em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: space-around;
+}
+
+.timers--timer{
     padding: 1em;
-    font-size: 2.5rem;
+    border: 1px solid lightgrey;
+    border-radius: 0.5em;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.timers--timer-el--countdown-container{
+    text-align: center;
+}
+
+.timers--timer-el--timer-options{
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    gap: 1em;
 }
 
 /* 
     TIMER BUTTONS
 */
+.start-btn,
+.pause-btn,
+.reset-btn,
+.loop-btn,
+.delete-btn{
+    width: 4em;
+    height: 2em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+}
+
 .paused:disabled{
     background: lightcoral;
 }

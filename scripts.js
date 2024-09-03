@@ -4,19 +4,50 @@ import uniqueId from "./utils.js"
 // CLEAR INTERVAL OBJECT
 const intervalObj = {}
 
-// LOOP OBJECT
-const loopObj = {}
-
 // VARIABLES
-const addBtn = document.getElementById("add-btn")
-const subtractBtn = document.getElementById("subtract-btn")
-const timerCountInput = document.getElementById("number-input")
+const newHr = document.getElementById("hour")
+const newMin = document.getElementById("minute")
+const newSec = document.getElementById("second")
 
 const newTimerBtn = document.getElementById("new-btn")
 
 const timersContainer = document.querySelector(".timers")
 
+const timerSettings = document.querySelector(".options--timer-settings")
+
 // EVENT LISTENERS
+
+// For converting input overflow into hours/minutes
+timerSettings.addEventListener("change", (e)=>{
+
+    const settingId = e.target.getAttribute("id")
+    const settingEl = document.getElementById(`${settingId}`)
+
+    if(settingId === "minute" && settingEl.value > 59){
+        newHr.value = newHr.value*1 + Math.floor(settingEl.value/60)
+        settingEl.value = settingEl.value%60
+
+        if(newHr.value < 10){
+            newHr.value = "0" + newHr.value
+        }
+    }
+
+    if(settingId === "second" && settingEl.value > 59){
+        newHr.value = newHr.value*1 + Math.floor(Math.floor(newMin.value*1)/60 + Math.floor(settingEl.value/3600))
+
+        newMin.value = newMin.value*1 + Math.floor(settingEl.value/60)
+
+        if(newMin.value%60 === 0){
+            newMin.value = 0
+        }else if(newMin.value%60 > 0){
+            newMin.value = newMin.value%60
+        }
+
+        settingEl.value = settingEl.value%60
+    }
+})
+
+// For creating a new timer
 newTimerBtn.addEventListener("click", ()=>{
 
     const id = uniqueId()
@@ -33,32 +64,45 @@ newTimerBtn.addEventListener("click", ()=>{
         data-default-hr="${defaultHr}"
         data-default-min="${defaultMin}"
         data-default-sec="${defaultSec}"
-        class="timer-el-${id} timer"
+        class="timers--timer-el-${id} timers--timer"
         >
-        <div class="countdown-container">
-        <span id="${id}-hr">${defaultHr}</span>
-        <span>:</span>
-        <span id="${id}-min">${defaultMin}</span>
-        <span>:</span>
-        <span id="${id}-sec">${defaultSec}</span>
-        <span>.</span>
-        <span id="${id}-ms" class="milisecond">000</span>
-        </div>
-        <div class="timer-options">
-        <button data-start="${id}" data-loop="false" class="start-btn ${id}">Start</button>
-        <button data-pause="${id}" class="pause-btn ${id}" disabled>Pause</button>
-        <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
-        <button data-loop="${id}" class="loop-btn ${id}">Loop</button>
-        <button data-delete="${id}" class="delete-btn">Delete</button>
-        </div>
+            <div class="timers--timer-el--countdown-container">
+                <span id="${id}-hr">${defaultHr}</span>
+                <span>:</span>
+                <span id="${id}-min">${defaultMin}</span>
+                <span>:</span>
+                <span id="${id}-sec">${defaultSec}</span>
+                <span class="text-small">.</span>
+                <span id="${id}-ms" class="text-small">000</span>
+            </div>
+            <div class="timers--timer-el--timer-options">
+                <button data-start="${id}" data-looping="false" class="start-btn ${id}">
+                    <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" >
+                    arrow_right</span>
+                </button>
+                <button data-pause="${id}" class="pause-btn ${id}" disabled>
+                    <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
+                    pause</span>
+                </button>
+                <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
+                <button data-loop="${id}" class="loop-btn ${id}">
+                    <span class="material-symbols-outlined" data-loop="${id}">
+                    restart_alt</span>
+                </button>
+                <button data-delete="${id}" class="delete-btn">
+                    <span class="material-symbols-outlined" data-delete="${id}">
+                    delete_forever</span>
+                </button>
+            </div>
         </div>`
         // not sure if data-id is needed by all buttons
     }
 })
 
+// For handling individual timer options
 timersContainer.addEventListener("click", (e) =>{
     if(e.target.getAttribute("data-start")){
-        handleStartButton(e.target.getAttribute("data-start"), e.target.getAttribute("data-loop"))
+        handleStartButton(e.target.getAttribute("data-start"), e.target.getAttribute("data-looping"))
     }
     if(e.target.getAttribute("data-pause")){
         handlePauseButton(e.target.getAttribute("data-pause"))
@@ -83,14 +127,14 @@ function handleStartButton(id, loop){
 
     const resetBtn = document.querySelectorAll(`.reset-btn.${id}`)[0]
 
-    const timerContainer = document.querySelector(`.timer-el-${id}`)
+    const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
     const hrEl = document.getElementById(`${id}-hr`)
     const minEl = document.getElementById(`${id}-min`)
     const secEl = document.getElementById(`${id}-sec`)
     const msEl = document.getElementById(`${id}-ms`)
 
-    let totalMilisec = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000
+    let totalMilisec = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000 + msEl.innerHTML*1
 
     const originalTime = (timerContainer.getAttribute("data-default-hr")*3600000) + (timerContainer.getAttribute("data-default-min")*60000) + timerContainer.getAttribute("data-default-sec")*1000
 
@@ -107,7 +151,7 @@ function handleStartButton(id, loop){
     
     intervalObj[id] = setInterval(()=>{
 
-        totalMilisec -= 100
+        totalMilisec -= 10
 
         const hrDisplay = Math.floor(totalMilisec/3600000)
 
@@ -143,9 +187,11 @@ function handleStartButton(id, loop){
 
                 pauseBtn.toggleAttribute("disabled")
                 resetBtn.toggleAttribute("disabled")
+                startBtn.toggleAttribute("disabled")
+                timerContainer.classList.toggle("active")
             }
         }
-    },100)
+    },10)
 
     // Handle styling of pause button when unpausing
     if(pauseBtn.classList.contains("paused")){
@@ -163,7 +209,7 @@ function handlePauseButton(id){
 
     clearInterval(intervalObj[id])
 
-    const timerContainer = document.querySelector(`.timer-el-${id}`)
+    const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
     const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
 
@@ -179,7 +225,7 @@ function handlePauseButton(id){
 
 function handleResetButton(id){
 
-    const timerContainer = document.querySelector(`.timer-el-${id}`)
+    const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
     const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
 
@@ -187,12 +233,12 @@ function handleResetButton(id){
 
     const startBtn = document.querySelector(`.start-btn.${id}`)
 
-    const resetEl = document.querySelector(`.timer-el-${id}`)
+    const resetEl = document.querySelector(`.timers--timer-el-${id}`)
 
     clearInterval(intervalObj[id])
 
     for(const child of resetEl.children){
-        if(child.getAttribute("class") === "countdown-container"){
+        if(child.getAttribute("class") === "timers--timer-el--countdown-container"){
             for(const c of child.children){
                 if(c.getAttribute("id") === `${id}-hr`){
                     c.innerHTML = resetEl.getAttribute("data-default-hr")
@@ -229,77 +275,117 @@ function handleResetButton(id){
         startBtn.toggleAttribute("disabled")
         timerContainer.classList.toggle("active")
     }
-
 }
 
 function handleLoopButton(id){
-    
-    // THIS PART WORKS - LOOPING BEFORE STARTING
 
     const loopBtn = document.querySelectorAll(`.loop-btn.${id}`)[0]
     
     const startBtn = document.querySelectorAll(`.start-btn.${id}`)[0]
 
+    const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
+
+    const resetBtn = document.querySelectorAll(`.reset-btn.${id}`)[0]
+
     const isLooping = loopBtn.classList.contains("loop")
-
-    startBtn.setAttribute("data-loop", !isLooping)
-
-    loopBtn.classList.toggle("loop")
-
-    //
     
-    // If already running
-    const timerContainer = document.querySelector(`.timer-el-${id}`)
+    const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
-    if(timerContainer.classList.contains("active" && !isLooping)){
+    const hrEl = document.getElementById(`${id}-hr`)
+    const minEl = document.getElementById(`${id}-min`)
+    const secEl = document.getElementById(`${id}-sec`)
+    const msEl = document.getElementById(`${id}-ms`)
+
+    let msLeft = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000 + msEl.innerHTML*1
+
+    const msOriginal = (timerContainer.getAttribute("data-default-hr")*3600000) + (timerContainer.getAttribute("data-default-min")*60000) + timerContainer.getAttribute("data-default-sec")*1000
+
+    // If the timer is active on press
+    if(timerContainer.classList.contains("active") && !isLooping){
+
+        startBtn.setAttribute("data-looping","true")
+
         clearInterval(intervalObj[id])
+
+        intervalObj[id] = setInterval(()=>{
+            msLeft -= 10
+
+            const hrDisplay = Math.floor(msLeft/3600000)
+
+            const minDisplay = Math.floor((msLeft - Math.floor(hrDisplay*3600000))/60000)
+
+            const secDisplay = Math.floor((msLeft-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
+
+            const msDisplay = msLeft - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+
+            hrEl.innerHTML = hrDisplay
+            minEl.innerHTML = minDisplay
+            secEl.innerHTML = secDisplay
+            msEl.innerHTML = msDisplay
+
+            if(msLeft === 0){
+                msLeft = msOriginal
+            }
+        }, 10)
+        loopBtn.classList.toggle("loop")
+
+    }else if(timerContainer.classList.contains("active") && isLooping){
+
+            startBtn.setAttribute("data-looping","false")
+
+            clearInterval(intervalObj[id])
+
+            intervalObj[id] = setInterval(()=>{
+                msLeft -= 10
+
+                const hrDisplay = Math.floor(msLeft/3600000)
+
+                const minDisplay = Math.floor((msLeft - Math.floor(hrDisplay*3600000))/60000)
+
+                const secDisplay = Math.floor((msLeft-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
+
+                const msDisplay = msLeft - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+
+                hrEl.innerHTML = hrDisplay
+                minEl.innerHTML = minDisplay
+                secEl.innerHTML = secDisplay
+                msEl.innerHTML = msDisplay
+
+                if(msLeft === 0){
+                    clearInterval(intervalObj[id])
+
+                    const hrDisplay = Math.floor(msOriginal/3600000)
+
+                    const minDisplay = Math.floor((msOriginal - Math.floor(hrDisplay*3600000))/60000)
+
+                    const secDisplay = Math.floor((msOriginal-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
+
+                    const msDisplay = msOriginal - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+
+                    hrEl.innerHTML = hrDisplay
+                    minEl.innerHTML = minDisplay
+                    secEl.innerHTML = secDisplay
+                    msEl.innerHTML = msDisplay
+
+                    startBtn.toggleAttribute("disabled")
+                    pauseBtn.toggleAttribute("disabled")
+                    resetBtn.toggleAttribute("disabled")
+                }
+            }, 10)
+            if(loopBtn.classList.contains("loop")){
+                loopBtn.classList.toggle("loop")
+            }
     }
-    // if(intervalObj[id]){
-
-        // clearInterval(intervalObj[id])
-
-        // const timerEl = document.querySelector(`.timer-el-${id}`)
-
-        // const hrEl = document.getElementById(`${id}-hr`)
-        // const minEl = document.getElementById(`${id}-min`)
-        // const secEl = document.getElementById(`${id}-sec`)
-
-        // let originalTime = (timerEl.getAttribute("data-default-hr")*3600) + (timerEl.getAttribute("data-default-min")*60) + timerEl.getAttribute("data-default-sec")*1
-
-        // let currentTime = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000
-
-        // intervalObj[id] = setInterval(()=>{
-
-        //     currentTime -= 10
-    
-        //     const hrDisplay = Math.floor(currentTime/3600000)
-    
-        //     const minDisplay = Math.floor((currentTime - Math.floor(hrDisplay*3600000))/60000)
-    
-        //     const secDisplay = Math.floor((currentTime-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-    
-        //     hrEl.innerHTML = hrDisplay
-        //     minEl.innerHTML = minDisplay
-        //     secEl.innerHTML = secDisplay
-    
-        //     if(currentTime === -1){
-        //         currentTime = originalTime
-        //         hrEl.innerHTML = timerEl.getAttribute("data-default-hr")
-        //         minEl.innerText = timerEl.getAttribute("data-default-min")
-        //         secEl.innerText = timerEl.getAttribute("data-default-sec")
-        //     }
-        //     console.log("tick")
-        // }, 10)
-
-        
-
-    // }
-
+    // If the timer is not active on press
+    else{
+        startBtn.setAttribute("data-looping", !isLooping)
+        loopBtn.classList.toggle("loop")
+    }
 }
 
 function handleDeleteButton(id){
 
-    const deleteEl = document.querySelector(`.timer-el-${id}`)
+    const deleteEl = document.querySelector(`.timers--timer-el-${id}`)
 
     deleteEl.remove()
     clearInterval(intervalObj[id])

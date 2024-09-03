@@ -2,14 +2,30 @@
 -stop all
 -pause all
 
--clicking on pause again should start the timer again
-    -alternatively, once a timer is paused, the pause button should become disabled, and user should press start again to continue
-
 -store timers in local storage
     -this will eventually move to firebase
+
+-looping
+
+-add labels to timer
+
+-edit timer label
+
+-edit timer settings
+
+-always center app
+
+-media query for smaller screens (mobile in particular)
+    -the timer settings and the actual timers themselves go beyond 100% width
 
 Issues:
 -adding a new timer while existing timers are running pauses the existing timers
 
 Refactor:
 instead of queryselectorall[0], simply change to query selector
+
+-start > pause > loop (starts the timer but shouldnt)
+
+-there is another issue with starting and pausing with a loop option (basically loop is enabled but the timer stops at the end anyway)
+
+-issue with smaller screens (see to do above)
