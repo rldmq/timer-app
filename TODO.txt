@@ -7,16 +7,13 @@
 
 -looping
 
--add labels to timer
+-edit timer label (ideally click on text and edit) or have an edit button (pencil)
 
--edit timer label
+-edit timer settings 
 
--edit timer settings
+-unsplash for backgrounds (very light)
 
--always center app
-
--media query for smaller screens (mobile in particular)
-    -the timer settings and the actual timers themselves go beyond 100% width
+-when the timer settings is 0, do not reset the name
 
 Issues:
 -adding a new timer while existing timers are running pauses the existing timers
@@ -28,4 +25,15 @@ instead of queryselectorall[0], simply change to query selector
 
 -there is another issue with starting and pausing with a loop option (basically loop is enabled but the timer stops at the end anyway)
 
--issue with smaller screens (see to do above)
+
+Here are some of the most common screen resolutions:
+Desktop: 1920×1080, 1366×768, 1280×1024, 1024×768
+Mobile: 375×667, 414×736, 360×800, 390×844
+Tablet: 768×1024, 1024×768, 601×962
+
+did today:
+fixed display to show double digits
+fixed input to reset upon creating new timer
+added media queries
+added timer label to timers
+added timer label editing function

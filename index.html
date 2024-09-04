@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html id="app-html">
     <head>
         <title>Timer App</title>
 
@@ -21,12 +21,18 @@
         <!-- Delete -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
+        <!-- Favicon -->
+        <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
+        <link rel="icon" type="image/png" sizes="32x32" href="./assets/favicon/favicon-32x32.png">
+        <link rel="icon" type="image/png" sizes="16x16" href="./assets/favicon/favicon-16x16.png">
+        <link rel="manifest" href="./assets/favicon/site.webmanifest">
+
         <!-- Style Sheet -->
         <link rel="stylesheet" href="./styles.css" />
 
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     </head>
-    <body>
+    <body id="body">
         <header>
             <h1 class="app-title">Timer App</h1>
             <p class="app-description">Create and run multiple timers in a single app.</p>
@@ -36,23 +42,26 @@
                 <h2 class="options--title">Timer Settings</h2>
                 <div class="options--timer-settings">
 
-                    <div class="options--timer-settings--display">
+                    <div class="options--timer-settings--display countdown-segment-1">
                         <label for="hour" class="label">
-                            <input id="hour" type="number" value="0" min="0" class="clock options--timer-settings--display--clock-hour"/>
+                            <input id="hour" type="number" placeholder="0" min="0" class="clock options--timer-settings--display--clock-hour"/>
                         </label>
                     </div>
-
-                    <div class="options--timer-settings--display">
+                    <span class="clock-divider countdown-segment-2">:</span>
+                    <div class="options--timer-settings--display countdown-segment-3">
                         <label for="minute" class="label">
-                            <input id="minute" type="number" value="0" min="0" class="clock options--timer-settings--display--clock-minute"/>
+                            <input id="minute" type="number" placeholder="0" min="0" class="clock options--timer-settings--display--clock-minute"/>
                         </label>
                     </div>
-
-                    <div class="options--timer-settings--display">
+                    <span class="clock-divider countdown-segment-4">:</span>
+                    <div class="options--timer-settings--display countdown-segment-5">
                         <label for="second" class="label">
-                            <input id="second" type="number" value="0" min="0" class="clock options--timer-settings--display--clock-second"/>
+                            <input id="second" type="number" placeholder="0" min="0" class="clock options--timer-settings--display--clock-second"/>
                         </label>
                     </div>
+                    <label for="timer-name" class="label" id="timer-name-label">
+                        <input id="timer-name" type="text" placeholder="Activity X Timer"/>
+                    </label>
                     <button id="new-btn">Create</button>
                 </div>
             </section>

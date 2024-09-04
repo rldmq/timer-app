@@ -5,20 +5,23 @@ import uniqueId from "./utils.js"
 const intervalObj = {}
 
 // VARIABLES
-const newHr = document.getElementById("hour")
-const newMin = document.getElementById("minute")
-const newSec = document.getElementById("second")
-
+const appFullBody = document.getElementById("app-html")
 const newTimerBtn = document.getElementById("new-btn")
 
 const timersContainer = document.querySelector(".timers")
 
 const timerSettings = document.querySelector(".options--timer-settings")
 
+let activeEl
+let activeElVal
+
 // EVENT LISTENERS
 
 // For converting input overflow into hours/minutes
 timerSettings.addEventListener("change", (e)=>{
+
+    const newHr = document.getElementById("hour")
+    const newMin = document.getElementById("minute")
 
     const settingId = e.target.getAttribute("id")
     const settingEl = document.getElementById(`${settingId}`)
@@ -52,9 +55,20 @@ newTimerBtn.addEventListener("click", ()=>{
 
     const id = uniqueId()
 
-    const defaultHr = document.getElementById("hour").value
-    const defaultMin = document.getElementById("minute").value
-    const defaultSec = document.getElementById("second").value
+    // If the input is blank, use 0.  If the input is less than 10, append "0".  Else, use the input value
+    const defaultHr = document.getElementById("hour").value === "" ? "00" 
+    : document.getElementById("hour").value < 10 ? "0" + document.getElementById("hour").value 
+    : document.getElementById("hour").value
+
+    const defaultMin = document.getElementById("minute").value === "" ? "00" 
+    : document.getElementById("minute").value < 10 ? "0" + document.getElementById("minute").value 
+    : document.getElementById("minute").value
+
+    const defaultSec = document.getElementById("second").value === "" ? "00" 
+    : document.getElementById("second").value < 10 ? "0" + document.getElementById("second").value 
+    : document.getElementById("second").value
+
+    const timerName = document.getElementById("timer-name").value === "" ? id : document.getElementById("timer-name").value
 
     if((defaultHr + defaultMin + defaultSec) > 0){
 
@@ -64,8 +78,10 @@ newTimerBtn.addEventListener("click", ()=>{
         data-default-hr="${defaultHr}"
         data-default-min="${defaultMin}"
         data-default-sec="${defaultSec}"
+        data-name="${timerName}"
         class="timers--timer-el-${id} timers--timer"
         >
+            <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${timerName}</span>
             <div class="timers--timer-el--countdown-container">
                 <span id="${id}-hr">${defaultHr}</span>
                 <span>:</span>
@@ -97,6 +113,10 @@ newTimerBtn.addEventListener("click", ()=>{
         </div>`
         // not sure if data-id is needed by all buttons
     }
+    document.getElementById("hour").value = ""
+    document.getElementById("minute").value = ""
+    document.getElementById("second").value = ""
+    document.getElementById("timer-name").value = ""
 })
 
 // For handling individual timer options
@@ -116,7 +136,25 @@ timersContainer.addEventListener("click", (e) =>{
     if(e.target.getAttribute("data-delete")){
         handleDeleteButton(e.target.getAttribute("data-delete"))
     }
+    if(e.target.getAttribute("data-nameid")){
+        handleRename(e.target.getAttribute("data-nameid"))
+    }
 })
+
+// For renaming timers (keyup)
+timersContainer.addEventListener("keyup",(e)=>{
+    if(e.key === "Enter" && e.target.getAttribute("data-nameid")){
+        handleRenameSubmit(e.target.getAttribute("data-nameid"))
+    }
+})
+
+// For renaming timers (click)
+appFullBody.addEventListener("click", (e)=>{
+    if(activeEl && !e.target.getAttribute("data-nameid")){
+        handleRenameSubmit(activeEl.getAttribute("data-rename"))
+    }
+})
+
 
 // FUNCTIONS
 function handleStartButton(id, loop){
@@ -161,10 +199,17 @@ function handleStartButton(id, loop){
 
         const msDisplay = totalMilisec - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
 
-        hrEl.innerHTML = hrDisplay
-        minEl.innerHTML = minDisplay
-        secEl.innerHTML = secDisplay
-        msEl.innerHTML = msDisplay
+        hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay 
+        : hrDisplay
+
+        minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay 
+        : minDisplay
+
+        secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay 
+        : secDisplay
+
+        msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay 
+        : msDisplay
 
         if(totalMilisec === 0){
             if(loop === "true"){
@@ -180,10 +225,10 @@ function handleStartButton(id, loop){
 
                 const msDisplayEnd = originalTime - Math.floor(hrDisplayEnd*3600000) - Math.floor(minDisplayEnd*60000) - Math.floor(secDisplayEnd*1000)
 
-                hrEl.innerHTML = hrDisplayEnd
-                minEl.innerHTML = minDisplayEnd
-                secEl.innerHTML = secDisplayEnd
-                msEl.innerHTML = msDisplayEnd
+                hrEl.innerHTML = hrDisplayEnd < 10 ? "0" + hrDisplayEnd : hrDisplayEnd
+                minEl.innerHTML = minDisplayEnd < 10 ? "0" + minDisplayEnd : minDisplayEnd
+                secEl.innerHTML = secDisplayEnd < 10 ? "0" + secDisplayEnd : secDisplayEnd
+                msEl.innerHTML = msDisplayEnd < 10 ? "0" + msDisplayEnd : msDisplayEnd
 
                 pauseBtn.toggleAttribute("disabled")
                 resetBtn.toggleAttribute("disabled")
@@ -318,10 +363,14 @@ function handleLoopButton(id){
 
             const msDisplay = msLeft - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
 
-            hrEl.innerHTML = hrDisplay
-            minEl.innerHTML = minDisplay
-            secEl.innerHTML = secDisplay
-            msEl.innerHTML = msDisplay
+            hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
+
+            minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
+
+            secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
+
+            msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay : msDisplay
+
 
             if(msLeft === 0){
                 msLeft = msOriginal
@@ -346,10 +395,14 @@ function handleLoopButton(id){
 
                 const msDisplay = msLeft - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
 
-                hrEl.innerHTML = hrDisplay
-                minEl.innerHTML = minDisplay
-                secEl.innerHTML = secDisplay
-                msEl.innerHTML = msDisplay
+                hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
+
+                minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
+
+                secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
+
+                msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay : msDisplay
+
 
                 if(msLeft === 0){
                     clearInterval(intervalObj[id])
@@ -362,10 +415,14 @@ function handleLoopButton(id){
 
                     const msDisplay = msOriginal - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
 
-                    hrEl.innerHTML = hrDisplay
-                    minEl.innerHTML = minDisplay
-                    secEl.innerHTML = secDisplay
-                    msEl.innerHTML = msDisplay
+                    hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
+
+                    minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
+
+                    secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
+
+                    msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay : msDisplay
+
 
                     startBtn.toggleAttribute("disabled")
                     pauseBtn.toggleAttribute("disabled")
@@ -387,8 +444,53 @@ function handleDeleteButton(id){
 
     const deleteEl = document.querySelector(`.timers--timer-el-${id}`)
 
-    deleteEl.remove()
-    clearInterval(intervalObj[id])
-    delete intervalObj[id]
+    deleteEl.classList.toggle("deleting")
+
+    setTimeout(()=>{
+        deleteEl.remove()
+        clearInterval(intervalObj[id])
+        delete intervalObj[id]
+    },650)
+}
+
+function handleRename(id){
+    const timerEl = document.querySelector(`.timers--timer-el-${id}`)
+    const refNode = document.querySelector(`.timer-name-${id}`)
+    const renameInput = document.createElement("input")
+
+    if(refNode){
+        renameInput.setAttribute("type","text")
+        renameInput.setAttribute("value",`${timerEl.getAttribute("data-name")}`)
+        renameInput.setAttribute("data-rename", `${id}`)
+        renameInput.setAttribute("data-nameid", `${id}`)
+        renameInput.setAttribute("class",`rename-input-${id}`)
+        renameInput.setAttribute("class","timers--timer-name")
+    
+        timerEl.replaceChild(renameInput,refNode)
+    
+        renameInput.focus()
+        renameInput.select()
+    
+        activeEl = renameInput
+        activeElVal = activeEl.value
+    }
+}
+
+function handleRenameSubmit(id){
+
+    const timerEl = document.querySelector(`.timers--timer-el-${id}`)
+
+    const refNode = activeEl
+    const newName = refNode.value.trim() ? refNode.value : activeElVal
+    
+    const updatedName = document.createElement("span")
+    
+    updatedName.setAttribute("class",`timers--timer-name timer-name-${id}`)
+    updatedName.setAttribute("data-nameid",`${id}`)
+    updatedName.textContent = newName
+
+    timerEl.replaceChild(updatedName, refNode)
+    timerEl.setAttribute("data-name", newName)
+    activeEl = null
 
 }
