@@ -5,8 +5,12 @@ import uniqueId from "./utils.js"
 const intervalObj = {}
 
 // VARIABLES
+const timerObj = JSON.parse(localStorage.getItem("timers")) || {}
+
 const appFullBody = document.getElementById("app-html")
 const newTimerBtn = document.getElementById("new-btn")
+const loadProfileForm = document.getElementById("load-form")
+const saveProfileForm = document.getElementById("save-form")
 
 const timersContainer = document.querySelector(".timers")
 
@@ -16,6 +20,18 @@ let activeEl
 let activeElVal
 
 // EVENT LISTENERS
+
+// For loading profiles
+loadProfileForm.addEventListener("submit",(e)=>{
+    e.preventDefault()
+    console.log("hello")
+})
+// For saving profiles
+saveProfileForm.addEventListener("submit",(e)=>{
+    e.preventDefault()
+    console.log("save")
+})
+    // need one for replacing /cancelling profiles?
 
 // For converting input overflow into hours/minutes
 timerSettings.addEventListener("change", (e)=>{
@@ -112,12 +128,95 @@ newTimerBtn.addEventListener("click", ()=>{
             </div>
         </div>`
         // not sure if data-id is needed by all buttons
+        document.getElementById("hour").value = ""
+        document.getElementById("minute").value = ""
+        document.getElementById("second").value = ""
+        document.getElementById("timer-name").value = ""
     }
-    document.getElementById("hour").value = ""
-    document.getElementById("minute").value = ""
-    document.getElementById("second").value = ""
-    document.getElementById("timer-name").value = ""
+
+    // Create the nested object
+    timerObj[id] = {}
+
+    // Assign properties to nested object
+    timerObj[id].defaultHr = defaultHr
+    timerObj[id].defaultMin = defaultMin
+    timerObj[id].defaultSec = defaultSec
+    timerObj[id].timerName = timerName
+    timerObj[id].timerId = id
+
 })
+
+// For loading timers in storage
+// loadTimers.addEventListener("click", ()=>{
+    
+//     if(localStorage.getItem("timers")){
+        
+//         const storedTimers = Object.values(JSON.parse(localStorage.getItem("timers")))
+        
+//         timersContainer.innerHTML = storedTimers.map((timer) => {
+//             const id = timer.timerId
+//             const name = timer.timerName
+//             const hr = timer.defaultHr
+//             const min = timer.defaultMin
+//             const sec = timer.defaultSec
+            
+//             return ( `<div 
+//                 data-timerNumber="${id}"
+//                 data-default-hr="${hr}"
+//                 data-default-min="${min}"
+//                 data-default-sec="${sec}"
+//                 data-name="${name}"
+//                 class="timers--timer-el-${id} timers--timer loading"
+//                 >
+//                 <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${name}</span>
+//                 <div class="timers--timer-el--countdown-container">
+//                 <span id="${id}-hr">${hr}</span>
+//                 <span>:</span>
+//                 <span id="${id}-min">${min}</span>
+//                 <span>:</span>
+//                 <span id="${id}-sec">${sec}</span>
+//                 <span class="text-small">.</span>
+//                 <span id="${id}-ms" class="text-small">000</span>
+//                 </div>
+//                 <div class="timers--timer-el--timer-options">
+//                 <button data-start="${id}" data-looping="false" class="start-btn ${id}">
+//                 <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" >
+//                 arrow_right</span>
+//                 </button>
+//                 <button data-pause="${id}" class="pause-btn ${id}" disabled>
+//                 <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
+//                 pause</span>
+//                 </button>
+//                 <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
+//                 <button data-loop="${id}" class="loop-btn ${id}">
+//                 <span class="material-symbols-outlined" data-loop="${id}">
+//                 restart_alt</span>
+//                 </button>
+//                 <button data-delete="${id}" class="delete-btn">
+//                 <span class="material-symbols-outlined" data-delete="${id}">
+//                 delete_forever</span>
+//                 </button>
+//                 </div>
+//                 </div>`)
+//         }).join("")
+    
+//         // Remove the "loading" class
+//         setTimeout(()=>{
+//             const loadingEls = document.querySelectorAll(".loading")
+                        
+//             for(let element of loadingEls){
+//                 element.classList.toggle("loading")
+//             }
+            
+//         }, 1500)
+//     }else{
+//         handleEmptyStorageNotification()
+//     }
+// })
+
+// saveCurrent.addEventListener("click",()=>{
+//     localStorage.setItem("timers", JSON.stringify(timerObj))
+// })
 
 // For handling individual timer options
 timersContainer.addEventListener("click", (e) =>{
@@ -161,9 +260,9 @@ function handleStartButton(id, loop){
 
     const startBtn = document.querySelector(`.start-btn.${id}`)
 
-    const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
+    const pauseBtn = document.querySelector(`.pause-btn.${id}`)
 
-    const resetBtn = document.querySelectorAll(`.reset-btn.${id}`)[0]
+    const resetBtn = document.querySelector(`.reset-btn.${id}`)
 
     const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
@@ -208,7 +307,7 @@ function handleStartButton(id, loop){
         secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay 
         : secDisplay
 
-        msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay 
+        msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay
         : msDisplay
 
         if(totalMilisec === 0){
@@ -228,7 +327,7 @@ function handleStartButton(id, loop){
                 hrEl.innerHTML = hrDisplayEnd < 10 ? "0" + hrDisplayEnd : hrDisplayEnd
                 minEl.innerHTML = minDisplayEnd < 10 ? "0" + minDisplayEnd : minDisplayEnd
                 secEl.innerHTML = secDisplayEnd < 10 ? "0" + secDisplayEnd : secDisplayEnd
-                msEl.innerHTML = msDisplayEnd < 10 ? "0" + msDisplayEnd : msDisplayEnd
+                msEl.innerHTML = msDisplayEnd == 0 ? "00" + msDisplayEnd : msDisplayEnd < 100 ? "0" + msDisplayEnd : msDisplayEnd
 
                 pauseBtn.toggleAttribute("disabled")
                 resetBtn.toggleAttribute("disabled")
@@ -256,7 +355,7 @@ function handlePauseButton(id){
 
     const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
-    const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
+    const pauseBtn = document.querySelector(`.pause-btn.${id}`)
 
     const startBtn = document.querySelector(`.start-btn.${id}`)
 
@@ -272,9 +371,9 @@ function handleResetButton(id){
 
     const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
 
-    const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
+    const pauseBtn = document.querySelector(`.pause-btn.${id}`)
 
-    const resetBtn = document.querySelectorAll(`.reset-btn.${id}`)[0]
+    const resetBtn = document.querySelector(`.reset-btn.${id}`)
 
     const startBtn = document.querySelector(`.start-btn.${id}`)
 
@@ -324,13 +423,13 @@ function handleResetButton(id){
 
 function handleLoopButton(id){
 
-    const loopBtn = document.querySelectorAll(`.loop-btn.${id}`)[0]
+    const loopBtn = document.querySelector(`.loop-btn.${id}`)
     
-    const startBtn = document.querySelectorAll(`.start-btn.${id}`)[0]
+    const startBtn = document.querySelector(`.start-btn.${id}`)
 
-    const pauseBtn = document.querySelectorAll(`.pause-btn.${id}`)[0]
+    const pauseBtn = document.querySelector(`.pause-btn.${id}`)
 
-    const resetBtn = document.querySelectorAll(`.reset-btn.${id}`)[0]
+    const resetBtn = document.querySelector(`.reset-btn.${id}`)
 
     const isLooping = loopBtn.classList.contains("loop")
     
@@ -369,7 +468,7 @@ function handleLoopButton(id){
 
             secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
 
-            msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay : msDisplay
+            msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay : msDisplay
 
 
             if(msLeft === 0){
@@ -401,7 +500,7 @@ function handleLoopButton(id){
 
                 secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
 
-                msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay : msDisplay
+                msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay : msDisplay
 
 
                 if(msLeft === 0){
@@ -421,7 +520,7 @@ function handleLoopButton(id){
 
                     secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
 
-                    msEl.innerHTML = msDisplay < 10 ? "0" + msDisplay : msDisplay
+                    msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay: msDisplay < 100 ? "0" + msDisplay : msDisplay
 
 
                     startBtn.toggleAttribute("disabled")
@@ -493,4 +592,95 @@ function handleRenameSubmit(id){
     timerEl.setAttribute("data-name", newName)
     activeEl = null
 
+    // Update timer object
+    timerObj[id].timerName = newName
+
 }
+
+// basically tests
+
+// function handleEmptyStorageNotification(){
+//     timersContainer.innerHTML = `<div class="noTimerNotification loading">There are no timers saved in storage.</div>`
+
+//     setTimeout(()=>{
+//         const notificationEl = document.querySelector(".noTimerNotification")
+
+//         notificationEl.classList.toggle("loading")
+//         notificationEl.classList.toggle("deleting")
+//     }, 1500)
+
+//     setTimeout(()=>{
+//         timersContainer.innerHTML = ""
+//     },2000)
+// }
+
+// document.getElementById("logObj").addEventListener("click", (e)=>{
+//     console.log(timerObj)
+// })
+
+// document.getElementById("logId").addEventListener("click", (e)=>{
+//     const localStorObj = JSON.parse(localStorage.getItem("timers"))
+//     console.log(localStorObj)
+// })
+
+// document.getElementById("clearLoc").addEventListener("click",()=>{
+//     localStorage.clear()
+
+//     for(let timer in timerObj){
+//         delete timerObj[timer]
+//     }
+// })
+
+
+// Testing area
+const testObj = {}
+
+document.getElementById("save-profile-form").addEventListener("submit",(e)=>{
+    e.preventDefault()
+    const profileName = document.querySelector(".save-profile-input").value
+
+    if(testObj[profileName]){
+        // pop up
+        document.getElementById("body").innerHTML += 
+        `
+        <div class="profileNotification">
+            <p>This profile already exists.  Select an option:</p>
+            <button id="test-replace" data-function="replace">Replace</button>
+            <button id="test-add" data-function="add">Add</button>
+            <button id="test-cancel" data-function="cancel">Cancel</button>
+        </div>
+        `
+        // add to profile, replace profile, cancel
+    }else if(profileName){
+        testObj[`${profileName}`] = {
+            "iamhim" : uniqueId(),
+            "purplelean" : uniqueId(),
+            "opps" : uniqueId(),
+        }
+
+        document.querySelector(".save-profile-input").value = ""
+    }
+})
+
+document.getElementById("logtestobj").addEventListener("click",()=>{
+    console.log(testObj)
+})
+
+document.getElementById("body").addEventListener("click",(e)=>{
+
+    const modal = document.querySelector(".profileNotification")
+
+    if(e.target.getAttribute("data-function")==="replace"){
+        console.log("replacing")
+
+        modal.remove()
+    }
+    if(e.target.getAttribute("data-function")==="add"){
+        console.log("adding")
+        modal.remove()
+    }
+    if(e.target.getAttribute("data-function")==="cancel"){
+        console.log("cancelling")
+        modal.remove()
+    }
+})

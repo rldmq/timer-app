@@ -2,29 +2,31 @@
 -stop all
 -pause all
 
--store timers in local storage
-    -this will eventually move to firebase
-
--looping
-
--edit timer label (ideally click on text and edit) or have an edit button (pencil)
+-firebase
 
 -edit timer settings 
 
 -unsplash for backgrounds (very light)
 
--when the timer settings is 0, do not reset the name
+-add alarm sound option
+
+-add function for display calculation (it is very repetitive)
+
+-add function for the innerhtml of timers (used by newtimerbtn and loadtimers)
+
+-change timer settings grid for desktop view
+
+-issue with name being broken when there are spaces
 
 Issues:
 -adding a new timer while existing timers are running pauses the existing timers
-
-Refactor:
-instead of queryselectorall[0], simply change to query selector
 
 -start > pause > loop (starts the timer but shouldnt)
 
 -there is another issue with starting and pausing with a loop option (basically loop is enabled but the timer stops at the end anyway)
 
+Refactor:
+--
 
 Here are some of the most common screen resolutions:
 Desktop: 1920×1080, 1366×768, 1280×1024, 1024×768
@@ -32,8 +34,13 @@ Mobile: 375×667, 414×736, 360×800, 390×844
 Tablet: 768×1024, 1024×768, 601×962
 
 did today:
-fixed display to show double digits
-fixed input to reset upon creating new timer
-added media queries
-added timer label to timers
-added timer label editing function
+-simplified code (queryselector)
+-fixed timer name input resetting when create button fails
+-store timers in local storage
+-ability to load timers from local storage
+-test code for replacing and adding to timer profiles
+
+Ideas:
+save layout - name
+    -the existing layout will be overridden (y/n)
+    -overwrite, add to, cancel (button options)

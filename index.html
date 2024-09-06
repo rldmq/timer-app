@@ -34,8 +34,19 @@
     </head>
     <body id="body">
         <header>
-            <h1 class="app-title">Timer App</h1>
-            <p class="app-description">Create and run multiple timers in a single app.</p>
+            <div>
+                <h1 class="app-title">Timer App</h1>
+                <p class="app-description">Create and run multiple timers in a single app.</p>
+            </div>
+            <div class="profiles-container">
+                <form id="load-form">
+                    <button id="load-btn">Load Profile</button>
+                </form>
+
+                <form id="save-form">
+                    <button id="save-btn">Save Profile</button>
+                </form>
+            </div>
         </header>
         <main>
             <section class="options">
@@ -65,6 +76,26 @@
                     <button id="new-btn">Create</button>
                 </div>
             </section>
+
+            <!-- TEMP AREA -->
+            <!-- <section>
+                <h3>Temp Area</h3>
+                <button id="logObj">Log Obj</button>
+                <button id="logId">Log Local Storage</button>
+                <button id="clearLoc">Clear Local Storage</button>
+                <button id="load-bt">Load Timers</button>
+                <button id="save-bt">Save Timers</button>
+            </section> -->
+            <section>
+                <h3>Temp Area 2</h3>
+                <form id="save-profile-form">
+                    <input type="text" placeholder="Profile Name" class="save-profile-input"/>
+                    <button class="save-profile-btn">Save</button>
+                </form>
+                <button id="logtestobj">log test obj</button>
+            </section>
+            <!-- TEMP AREA -->
+
             <section class="timers">
 
             </section>

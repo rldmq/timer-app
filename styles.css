@@ -58,11 +58,19 @@ span.text-small{
 */
 body{
     padding: 2em;
-
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 main{
     margin-top: 1em;
+    height: 100%;
+}
+
+header{
+    display: flex;
+    justify-content: space-between;
 }
 
 /* 
@@ -277,4 +285,32 @@ input.clock,
 .deleting{
     opacity: 0;
     transition: opacity 500ms ease-in;
+}
+
+.loading{
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn{
+    0% {opacity: 0;}
+    100%{opacity: 1;}
+}
+
+/* 
+    NOTIFICATIONS / MODALS
+*/
+.noTimerNotification{
+    border: 2px solid red;
+    border-radius: 0.5em;
+    padding: 1em;
+    background: rgba(255, 182, 193, 0.556);
+    color: red;
+    margin-top: 3em;
+}
+
+.profileNotification{
+    position: absolute;
+    background: white;
+    border: 5px solid black;
+    padding: 2em;
 }
