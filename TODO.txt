@@ -34,11 +34,11 @@ Mobile: 375×667, 414×736, 360×800, 390×844
 Tablet: 768×1024, 1024×768, 601×962
 
 did today:
--simplified code (queryselector)
--fixed timer name input resetting when create button fails
--store timers in local storage
--ability to load timers from local storage
--test code for replacing and adding to timer profiles
+// finish loading
+    // add in cancel
+//finish saving
+    // add in cancel
+    // add in replace
 
 Ideas:
 save layout - name

@@ -17,12 +17,12 @@ setInterval(()=>{
 This was fine initially, but the complexity of the IF statements increased once minutes and hours were being calculated.
 
 The solution I came up with was to calculate the total time in seconds and simply decrement that total by 1 per second.  Then, the number being decremented is used by the display by using Math.floor/timescale (hours, minutes)
-
+------------------------------------------------------------
 2. How to handle STOP and PAUSE when the setInterval is handled by the START function?
 My initial approach was to completely replace the timer element on the page with a copy using CLONE.  There were a few issues with this, but the main issue is that the setInterval is still running even with the element completely removed (which is obvious now, but not at the time)
 
 After some searching, people recommended using a global variable to store the setInterval.  I ended up using an object to store the setInterval, using the timer ID as the key to be used for clearInterval.
-
+------------------------------------------------------------
 3. How to handle looping the timer? (+issues that popped up)
 My approch to this was to use an IF statement to determine what the button will do if the timer is active and if the timer is inactive.
 
@@ -33,4 +33,11 @@ If the timer is active, clear the setInterval for that timer and create a new on
 This button was the most complex to handle, since it exposed issues with the timer and due to the number of circumstances to test out.
 
 The main issue that I came across with the timer was that it was adding an extra second when the timer is looping.  This is because the setInterval initially ran every second.  This issue was fixed by changing the setInterval to run every 10ms (the minimum delay).
+------------------------------------------------------------
+4. When the modal HTML is appended as the last element of the body (meaning it is after the script tag), it breaks all the JS (buttons stop working) even when the modal is removed.
 
+It's not clear to me why, but explicitly stating that the "modal" will be inserted before the <script> tag fixes the issue.
+
+What is confusing to me is that the modal gets removed even though it is after the script tag, and then it is the removal of the modal element that breaks the rest of the application.
+------------------------------------------------------------
+5. --

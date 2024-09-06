@@ -1,3 +1,4 @@
+console.log("loaded")
 // IMPORTS
 import uniqueId from "./utils.js"
 
@@ -5,12 +6,14 @@ import uniqueId from "./utils.js"
 const intervalObj = {}
 
 // VARIABLES
-const timerObj = JSON.parse(localStorage.getItem("timers")) || {}
+const timerObj = {}
+// const timerObj = JSON.parse(localStorage.getItem("timers")) || {}
 
-const appFullBody = document.getElementById("app-html")
+const appHtml = document.getElementById("app-html")
+const appBody = document.getElementById("body")
 const newTimerBtn = document.getElementById("new-btn")
-const loadProfileForm = document.getElementById("load-form")
-const saveProfileForm = document.getElementById("save-form")
+const loadBtn = document.getElementById("load-btn")
+const saveBtn = document.getElementById("save-btn")
 
 const timersContainer = document.querySelector(".timers")
 
@@ -21,15 +24,66 @@ let activeElVal
 
 // EVENT LISTENERS
 
-// For loading profiles
-loadProfileForm.addEventListener("submit",(e)=>{
-    e.preventDefault()
-    console.log("hello")
+// Button for load profiles modal
+loadBtn.addEventListener("click",(e)=>{
+    //appbody
+    const scriptTag = document.getElementsByTagName("script")[0]
+
+    const modalContainer = document.createElement("div")
+    modalContainer.classList.add("modal-background")
+    modalContainer.innerHTML = 
+    `
+    <div class="modal load-modal">
+        <p>Enter the profile name to load:</p>
+        <input type="text" placeholder="Profile name" id="profile-load-input"/>
+        <button id="profile-load-btn" class="modal-btn">Load</button>
+        <button id="profile-cancel-btn" class="modal-btn">Cancel</button>
+    </div>
+    `
+
+    scriptTag.before(modalContainer)
+    
+    // appBody.innerHTML += 
+    // `
+    //     <div class="modal-background"/>
+    //         <div class="modal load-modal">
+    //             <p>Enter the profile name to load:</p>
+    //             <input type="text" placeholder="Profle name" id="profile-load-input" required/>
+    //             <button id="profile-load-btn" class="modal-btn">Load</button>
+    //             <button id="profile-cancel-btn" class="modal-btn">Cancel</button>
+    //         </div>
+    //     </div>
+    // `
 })
+
+// For handling modals
+
+
 // For saving profiles
-saveProfileForm.addEventListener("submit",(e)=>{
-    e.preventDefault()
-    console.log("save")
+saveBtn.addEventListener("click",(e)=>{
+    // If there are timers on the screen
+    if(Object.values(timerObj).length){
+        const scriptTag = document.getElementsByTagName("script")[0]
+
+        const modalContainer = document.createElement("div")
+        modalContainer.classList.add("modal-background")
+        modalContainer.innerHTML = 
+        `
+        <div class="modal save-modal">
+            <p>Enter the profile name to save:</p>
+            <input type="text" placeholder="Profle name" id="profile-save-input" required/>
+            <button id="profile-save-btn" class="modal-btn">Save</button>
+            <button id="profile-replace-btn" class="modal-btn">Replace</button>
+            <button id="profile-merge-btn" class="modal-btn">Merge</button>
+            <button id="profile-cancel-btn" class="modal-btn">Cancel</button>
+        </div>
+        `
+
+        scriptTag.before(modalContainer)
+    }else{
+        console.log("no obj")
+    }
+
 })
     // need one for replacing /cancelling profiles?
 
@@ -146,78 +200,6 @@ newTimerBtn.addEventListener("click", ()=>{
 
 })
 
-// For loading timers in storage
-// loadTimers.addEventListener("click", ()=>{
-    
-//     if(localStorage.getItem("timers")){
-        
-//         const storedTimers = Object.values(JSON.parse(localStorage.getItem("timers")))
-        
-//         timersContainer.innerHTML = storedTimers.map((timer) => {
-//             const id = timer.timerId
-//             const name = timer.timerName
-//             const hr = timer.defaultHr
-//             const min = timer.defaultMin
-//             const sec = timer.defaultSec
-            
-//             return ( `<div 
-//                 data-timerNumber="${id}"
-//                 data-default-hr="${hr}"
-//                 data-default-min="${min}"
-//                 data-default-sec="${sec}"
-//                 data-name="${name}"
-//                 class="timers--timer-el-${id} timers--timer loading"
-//                 >
-//                 <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${name}</span>
-//                 <div class="timers--timer-el--countdown-container">
-//                 <span id="${id}-hr">${hr}</span>
-//                 <span>:</span>
-//                 <span id="${id}-min">${min}</span>
-//                 <span>:</span>
-//                 <span id="${id}-sec">${sec}</span>
-//                 <span class="text-small">.</span>
-//                 <span id="${id}-ms" class="text-small">000</span>
-//                 </div>
-//                 <div class="timers--timer-el--timer-options">
-//                 <button data-start="${id}" data-looping="false" class="start-btn ${id}">
-//                 <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" >
-//                 arrow_right</span>
-//                 </button>
-//                 <button data-pause="${id}" class="pause-btn ${id}" disabled>
-//                 <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
-//                 pause</span>
-//                 </button>
-//                 <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
-//                 <button data-loop="${id}" class="loop-btn ${id}">
-//                 <span class="material-symbols-outlined" data-loop="${id}">
-//                 restart_alt</span>
-//                 </button>
-//                 <button data-delete="${id}" class="delete-btn">
-//                 <span class="material-symbols-outlined" data-delete="${id}">
-//                 delete_forever</span>
-//                 </button>
-//                 </div>
-//                 </div>`)
-//         }).join("")
-    
-//         // Remove the "loading" class
-//         setTimeout(()=>{
-//             const loadingEls = document.querySelectorAll(".loading")
-                        
-//             for(let element of loadingEls){
-//                 element.classList.toggle("loading")
-//             }
-            
-//         }, 1500)
-//     }else{
-//         handleEmptyStorageNotification()
-//     }
-// })
-
-// saveCurrent.addEventListener("click",()=>{
-//     localStorage.setItem("timers", JSON.stringify(timerObj))
-// })
-
 // For handling individual timer options
 timersContainer.addEventListener("click", (e) =>{
     if(e.target.getAttribute("data-start")){
@@ -240,17 +222,47 @@ timersContainer.addEventListener("click", (e) =>{
     }
 })
 
-// For renaming timers (keyup)
-timersContainer.addEventListener("keyup",(e)=>{
+// For handling keyups (renaming && modals)
+appHtml.addEventListener("keyup",(e)=>{
     if(e.key === "Enter" && e.target.getAttribute("data-nameid")){
         handleRenameSubmit(e.target.getAttribute("data-nameid"))
     }
+
+    if(e.key === "Enter" && e.target.getAttribute("id") === "profile-load-input"){
+        const name = document.getElementById("profile-load-input").value
+        if(name.trim()){
+            handleLoadProfile(name)
+        }
+    }
+
+    if(e.key === "Enter" && e.target.getAttribute("id") === "profile-save-input"){
+        const name = document.getElementById("profile-save-input").value
+        if(name.trim()){
+            handleSaveProfile(name)
+        }else{
+            console.log("Please enter a valid name")
+        }
+    }
 })
 
-// For renaming timers (click)
-appFullBody.addEventListener("click", (e)=>{
+// For renaming timers (click) && for handling modals
+appHtml.addEventListener("click", (e)=>{
     if(activeEl && !e.target.getAttribute("data-nameid")){
         handleRenameSubmit(activeEl.getAttribute("data-rename"))
+    }
+    if(e.target.getAttribute("id") === "profile-load-btn"){
+        const name = document.getElementById("profile-load-input").value
+        if(name.trim()){
+            handleLoadProfile(name)
+        }
+    }
+    if(e.target.getAttribute("id") === "profile-save-btn"){
+        const name = document.getElementById("profile-save-input").value
+        if(name.trim()){
+            handleSaveProfile(name)
+        }else{
+            console.log("Please enter a valid name")
+        }
     }
 })
 
@@ -597,6 +609,119 @@ function handleRenameSubmit(id){
 
 }
 
+function handleSaveProfile(name){
+    // grab localstorage so it can be added to
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    if(profiles[name]){
+        console.log("this exists")
+    }else{
+        profiles[name] = {
+            name: name,
+            timers: timerObj
+        }
+        document.querySelector(".modal-background").remove()
+    }
+    localStorage.setItem("timers", JSON.stringify(profiles))
+}
+
+function handleLoadProfile(name){
+
+    const modalBackground = document.querySelector(".modal-background")
+    const loadInput = document.getElementById("profile-load-input")
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    console.log(loadInput.classList,loadInput)
+
+    if(profiles[name]){
+        if(Object.values(timerObj).length > 0){
+            for(let item in timerObj){
+                delete timerObj[item]
+            }
+        }
+        for(let id in profiles[name].timers){
+            timerObj[id] = {...profiles[name].timers[id]}
+        }
+        modalBackground.remove()
+        handleLoadProfileRender()
+    }else{
+        document.querySelector(".modal").innerHTML += `
+            <p class="not-found loading">Profile name not found.</p>
+        `
+        loadInput.classList.toggle("input-error")
+
+        setTimeout(()=>{
+            document.querySelector(".not-found").remove()
+            // loadInput.classList.toggle("input-error")
+        }, 2000)
+
+        setTimeout(()=>{
+            document.querySelector(".not-found").classList.toggle("deleting")
+        },1500)
+    }
+
+}
+
+function handleLoadProfileRender(){
+
+    timersContainer.innerHTML = Object.values(timerObj).map(timer => {
+        const id = timer.timerId
+        const name= timer.timerName
+        const hr = timer.defaultHr
+        const min = timer.defaultMin
+        const sec = timer.defaultSec
+
+        return ( `<div 
+            data-timerNumber="${id}"
+            data-default-hr="${hr}"
+            data-default-min="${min}"
+            data-default-sec="${sec}"
+            data-name="${name}"
+            class="timers--timer-el-${id} timers--timer loading"
+            >
+            <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${name}</span>
+            <div class="timers--timer-el--countdown-container">
+            <span id="${id}-hr">${hr}</span>
+            <span>:</span>
+            <span id="${id}-min">${min}</span>
+            <span>:</span>
+            <span id="${id}-sec">${sec}</span>
+            <span class="text-small">.</span>
+            <span id="${id}-ms" class="text-small">000</span>
+            </div>
+            <div class="timers--timer-el--timer-options">
+            <button data-start="${id}" data-looping="false" class="start-btn ${id}">
+            <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" >
+            arrow_right</span>
+            </button>
+            <button data-pause="${id}" class="pause-btn ${id}" disabled>
+            <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
+            pause</span>
+            </button>
+            <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
+            <button data-loop="${id}" class="loop-btn ${id}">
+            <span class="material-symbols-outlined" data-loop="${id}">
+            restart_alt</span>
+            </button>
+            <button data-delete="${id}" class="delete-btn">
+            <span class="material-symbols-outlined" data-delete="${id}">
+            delete_forever</span>
+            </button>
+            </div>
+            </div>`)
+    }).join("")
+
+    // Remove the "loading" class
+    setTimeout(()=>{
+        const loadingEls = document.querySelectorAll(".loading")
+                    
+        for(let element of loadingEls){
+            element.classList.toggle("loading")
+        }
+        
+    }, 1500)
+}
+
 // basically tests
 
 // function handleEmptyStorageNotification(){
@@ -614,22 +739,22 @@ function handleRenameSubmit(id){
 //     },2000)
 // }
 
-// document.getElementById("logObj").addEventListener("click", (e)=>{
-//     console.log(timerObj)
-// })
+document.getElementById("logObj").addEventListener("click", (e)=>{
+    console.log(timerObj)
+})
 
-// document.getElementById("logId").addEventListener("click", (e)=>{
-//     const localStorObj = JSON.parse(localStorage.getItem("timers"))
-//     console.log(localStorObj)
-// })
+document.getElementById("logId").addEventListener("click", (e)=>{
+    const localStorObj = JSON.parse(localStorage.getItem("timers"))
+    console.log(localStorObj)
+})
 
-// document.getElementById("clearLoc").addEventListener("click",()=>{
-//     localStorage.clear()
+document.getElementById("clearLoc").addEventListener("click",()=>{
+    localStorage.clear()
 
-//     for(let timer in timerObj){
-//         delete timerObj[timer]
-//     }
-// })
+    for(let timer in timerObj){
+        delete timerObj[timer]
+    }
+})
 
 
 // Testing area

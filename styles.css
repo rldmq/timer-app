@@ -299,18 +299,51 @@ input.clock,
 /* 
     NOTIFICATIONS / MODALS
 */
-.noTimerNotification{
+
+
+/* .noTimerNotification{
     border: 2px solid red;
     border-radius: 0.5em;
     padding: 1em;
     background: rgba(255, 182, 193, 0.556);
     color: red;
     margin-top: 3em;
-}
+} */
 
-.profileNotification{
+/* .profileNotification{
     position: absolute;
     background: white;
     border: 5px solid black;
     padding: 2em;
+} */
+
+.modal-background{
+    background: rgba(125,125,125, 0.5);
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    left:0;
+    top: 0;
+}
+
+.modal{
+    position: relative;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background: white;
+    width: fit-content;
+    height: fit-content;
+    padding: 2em;
+    border-radius: 1em;
+    box-shadow: 0 0 1em 0.25em grey;
+}
+
+.not-found{
+    color: red;
+}
+
+.input-error{
+    border: 1px solid red;
+    /* background: red; */
 }
