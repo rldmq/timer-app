@@ -1,4 +1,3 @@
-console.log("loaded")
 // IMPORTS
 import uniqueId from "./utils.js"
 
@@ -7,13 +6,14 @@ const intervalObj = {}
 
 // VARIABLES
 const timerObj = {}
-// const timerObj = JSON.parse(localStorage.getItem("timers")) || {}
+
+let modalUp = false
 
 const appHtml = document.getElementById("app-html")
-const appBody = document.getElementById("body")
 const newTimerBtn = document.getElementById("new-btn")
 const loadBtn = document.getElementById("load-btn")
 const saveBtn = document.getElementById("save-btn")
+const scriptTag = document.getElementsByTagName("script")[0]
 
 const timersContainer = document.querySelector(".timers")
 
@@ -26,8 +26,6 @@ let activeElVal
 
 // Button for load profiles modal
 loadBtn.addEventListener("click",(e)=>{
-    //appbody
-    const scriptTag = document.getElementsByTagName("script")[0]
 
     const modalContainer = document.createElement("div")
     modalContainer.classList.add("modal-background")
@@ -42,28 +40,16 @@ loadBtn.addEventListener("click",(e)=>{
     `
 
     scriptTag.before(modalContainer)
-    
-    // appBody.innerHTML += 
-    // `
-    //     <div class="modal-background"/>
-    //         <div class="modal load-modal">
-    //             <p>Enter the profile name to load:</p>
-    //             <input type="text" placeholder="Profle name" id="profile-load-input" required/>
-    //             <button id="profile-load-btn" class="modal-btn">Load</button>
-    //             <button id="profile-cancel-btn" class="modal-btn">Cancel</button>
-    //         </div>
-    //     </div>
-    // `
+    modalUp = true
+
+    document.getElementById("profile-load-input").focus()
+
 })
-
-// For handling modals
-
 
 // For saving profiles
 saveBtn.addEventListener("click",(e)=>{
     // If there are timers on the screen
     if(Object.values(timerObj).length){
-        const scriptTag = document.getElementsByTagName("script")[0]
 
         const modalContainer = document.createElement("div")
         modalContainer.classList.add("modal-background")
@@ -71,7 +57,7 @@ saveBtn.addEventListener("click",(e)=>{
         `
         <div class="modal save-modal">
             <p>Enter the profile name to save:</p>
-            <input type="text" placeholder="Profle name" id="profile-save-input" required/>
+            <input type="text" placeholder="Profle name" id="profile-save-input"/>
             <button id="profile-save-btn" class="modal-btn">Save</button>
             <button id="profile-replace-btn" class="modal-btn">Replace</button>
             <button id="profile-merge-btn" class="modal-btn">Merge</button>
@@ -80,12 +66,14 @@ saveBtn.addEventListener("click",(e)=>{
         `
 
         scriptTag.before(modalContainer)
+        modalUp = true
+
+        document.getElementById("profile-save-input").focus()
     }else{
-        console.log("no obj")
+        handleBottomPopup("error", "There are no timers to save.")
     }
 
 })
-    // need one for replacing /cancelling profiles?
 
 // For converting input overflow into hours/minutes
 timerSettings.addEventListener("change", (e)=>{
@@ -122,7 +110,122 @@ timerSettings.addEventListener("change", (e)=>{
 
 // For creating a new timer
 newTimerBtn.addEventListener("click", ()=>{
+    handleCreateTimer()
+})
 
+// For handling individual timer options
+timersContainer.addEventListener("click", (e) =>{
+    if(e.target.getAttribute("data-start")){
+        handleStartButton(e.target.getAttribute("data-start"), e.target.getAttribute("data-looping"))
+    }
+    if(e.target.getAttribute("data-pause")){
+        handlePauseButton(e.target.getAttribute("data-pause"))
+    }
+    if(e.target.getAttribute("data-reset")){
+        handleResetButton(e.target.getAttribute("data-reset"))
+    }
+    if(e.target.getAttribute("data-loop")){
+        handleLoopButton(e.target.getAttribute("data-loop"))
+    }
+    if(e.target.getAttribute("data-delete")){
+        handleDeleteButton(e.target.getAttribute("data-delete"))
+    }
+    if(e.target.getAttribute("data-nameid")){
+        handleRename(e.target.getAttribute("data-nameid"))
+    }
+})
+
+// For handling keyups (renaming && modals)
+appHtml.addEventListener("keyup",(e)=>{
+    if(e.key === "Enter"){
+        if(e.target.getAttribute("data-nameid")){
+            handleRenameSubmit(e.target.getAttribute("data-nameid"))
+        }
+        
+        if(e.target.getAttribute("id") === "profile-load-input"){
+            const name = document.getElementById("profile-load-input").value
+            if(name.trim()){
+                handleLoadProfile(name)
+            }
+        }
+
+        if(e.target.getAttribute("id") === "profile-save-input"){
+            const saveInput = document.getElementById("profile-save-input")
+
+            const name = saveInput.value
+
+            if(name.includes(" ")){
+                modalErrorMessage(saveInput,"Please avoid using spaces in the profile name.")
+            }else{
+                handleSaveProfile(name)
+
+            }
+        }
+
+        if(e.target.getAttribute("id") === "hour"){
+            document.getElementById("minute").focus()
+        }
+
+        if(e.target.getAttribute("id") === "minute"){
+            document.getElementById("second").focus()
+        }
+
+        if(e.target.getAttribute("id") === "second"){
+            document.getElementById("timer-name").focus()
+        }
+
+        if(e.target.getAttribute("id") === "timer-name"){
+            console.log("this is basically newTimerBtn.addEventListener(click, ()=>{})")
+        }
+    }
+
+    if(e.key === "Escape" && modalUp){
+        handleCloseModal()
+    }
+})
+
+// For renaming timers (click) && for handling modals
+appHtml.addEventListener("click", (e)=>{
+    if(activeEl && !e.target.getAttribute("data-nameid")){
+        handleRenameSubmit(activeEl.getAttribute("data-rename"))
+    }
+    if(e.target.getAttribute("id") === "profile-load-btn"){
+        const name = document.getElementById("profile-load-input").value
+        if(name.trim()){
+            handleLoadProfile(name)
+        }
+    }
+    if(e.target.getAttribute("id") === "profile-save-btn"){
+        const saveInput = document.getElementById("profile-save-input")
+
+        const name = saveInput.value
+
+        if(name.includes(" ")){
+            modalErrorMessage(saveInput,"Please avoid using spaces in the profile name.")
+        }else{
+            handleSaveProfile(name)
+
+        }
+    }
+    if(e.target.getAttribute("id") === "profile-cancel-btn"){
+        handleCloseModal()
+    }
+    if(modalUp && e.target.getAttribute("class") === "modal-background"){
+        handleCloseModal()
+    }
+    if(e.target.getAttribute("id") === "profile-replace-btn"){
+        const name = document.getElementById("profile-save-input").value
+        handleReplaceButton(name)
+    }
+    if(e.target.getAttribute("id") === "profile-merge-btn"){
+        const name = document.getElementById("profile-save-input").value
+        handleMergeButton(name)
+    }
+})
+
+
+// FUNCTIONS
+function handleCreateTimer(){
     const id = uniqueId()
 
     // If the input is blank, use 0.  If the input is less than 10, append "0".  Else, use the input value
@@ -197,77 +300,20 @@ newTimerBtn.addEventListener("click", ()=>{
     timerObj[id].defaultSec = defaultSec
     timerObj[id].timerName = timerName
     timerObj[id].timerId = id
+}
 
-})
+function timerDisplayCalculation(totalMs){
+    const hrDisplay = Math.floor(totalMs/3600000)
 
-// For handling individual timer options
-timersContainer.addEventListener("click", (e) =>{
-    if(e.target.getAttribute("data-start")){
-        handleStartButton(e.target.getAttribute("data-start"), e.target.getAttribute("data-looping"))
-    }
-    if(e.target.getAttribute("data-pause")){
-        handlePauseButton(e.target.getAttribute("data-pause"))
-    }
-    if(e.target.getAttribute("data-reset")){
-        handleResetButton(e.target.getAttribute("data-reset"))
-    }
-    if(e.target.getAttribute("data-loop")){
-        handleLoopButton(e.target.getAttribute("data-loop"))
-    }
-    if(e.target.getAttribute("data-delete")){
-        handleDeleteButton(e.target.getAttribute("data-delete"))
-    }
-    if(e.target.getAttribute("data-nameid")){
-        handleRename(e.target.getAttribute("data-nameid"))
-    }
-})
+    const minDisplay = Math.floor((totalMs - Math.floor(hrDisplay*3600000))/60000)
 
-// For handling keyups (renaming && modals)
-appHtml.addEventListener("keyup",(e)=>{
-    if(e.key === "Enter" && e.target.getAttribute("data-nameid")){
-        handleRenameSubmit(e.target.getAttribute("data-nameid"))
-    }
+    const secDisplay = Math.floor((totalMs-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
 
-    if(e.key === "Enter" && e.target.getAttribute("id") === "profile-load-input"){
-        const name = document.getElementById("profile-load-input").value
-        if(name.trim()){
-            handleLoadProfile(name)
-        }
-    }
+    const msDisplay = totalMs - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
 
-    if(e.key === "Enter" && e.target.getAttribute("id") === "profile-save-input"){
-        const name = document.getElementById("profile-save-input").value
-        if(name.trim()){
-            handleSaveProfile(name)
-        }else{
-            console.log("Please enter a valid name")
-        }
-    }
-})
+    return [hrDisplay, minDisplay, secDisplay, msDisplay]
+}
 
-// For renaming timers (click) && for handling modals
-appHtml.addEventListener("click", (e)=>{
-    if(activeEl && !e.target.getAttribute("data-nameid")){
-        handleRenameSubmit(activeEl.getAttribute("data-rename"))
-    }
-    if(e.target.getAttribute("id") === "profile-load-btn"){
-        const name = document.getElementById("profile-load-input").value
-        if(name.trim()){
-            handleLoadProfile(name)
-        }
-    }
-    if(e.target.getAttribute("id") === "profile-save-btn"){
-        const name = document.getElementById("profile-save-input").value
-        if(name.trim()){
-            handleSaveProfile(name)
-        }else{
-            console.log("Please enter a valid name")
-        }
-    }
-})
-
-
-// FUNCTIONS
 function handleStartButton(id, loop){
 
     const startBtn = document.querySelector(`.start-btn.${id}`)
@@ -283,7 +329,7 @@ function handleStartButton(id, loop){
     const secEl = document.getElementById(`${id}-sec`)
     const msEl = document.getElementById(`${id}-ms`)
 
-    let totalMilisec = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000 + msEl.innerHTML*1
+    let totalMillisec = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000 + msEl.innerHTML*1
 
     const originalTime = (timerContainer.getAttribute("data-default-hr")*3600000) + (timerContainer.getAttribute("data-default-min")*60000) + timerContainer.getAttribute("data-default-sec")*1000
 
@@ -300,15 +346,9 @@ function handleStartButton(id, loop){
     
     intervalObj[id] = setInterval(()=>{
 
-        totalMilisec -= 10
+        totalMillisec -= 10
 
-        const hrDisplay = Math.floor(totalMilisec/3600000)
-
-        const minDisplay = Math.floor((totalMilisec - Math.floor(hrDisplay*3600000))/60000)
-
-        const secDisplay = Math.floor((totalMilisec-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-
-        const msDisplay = totalMilisec - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+        const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(totalMillisec)
 
         hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay 
         : hrDisplay
@@ -322,19 +362,13 @@ function handleStartButton(id, loop){
         msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay
         : msDisplay
 
-        if(totalMilisec === 0){
+        if(totalMillisec === 0){
             if(loop === "true"){
-                totalMilisec = originalTime
+                totalMillisec = originalTime
             }else{
                 clearInterval(intervalObj[id])
 
-                const hrDisplayEnd = Math.floor(originalTime/3600000)
-
-                const minDisplayEnd = Math.floor((originalTime - Math.floor(hrDisplayEnd*3600000))/60000)
-
-                const secDisplayEnd = Math.floor((originalTime-Math.floor(hrDisplayEnd*3600000)-Math.floor(minDisplay*60000))/1000)
-
-                const msDisplayEnd = originalTime - Math.floor(hrDisplayEnd*3600000) - Math.floor(minDisplayEnd*60000) - Math.floor(secDisplayEnd*1000)
+                const [hrDisplayEnd, minDisplayEnd, secDisplayEnd, msDisplayEnd] = timerDisplayCalculation(originalTime)
 
                 hrEl.innerHTML = hrDisplayEnd < 10 ? "0" + hrDisplayEnd : hrDisplayEnd
                 minEl.innerHTML = minDisplayEnd < 10 ? "0" + minDisplayEnd : minDisplayEnd
@@ -466,13 +500,7 @@ function handleLoopButton(id){
         intervalObj[id] = setInterval(()=>{
             msLeft -= 10
 
-            const hrDisplay = Math.floor(msLeft/3600000)
-
-            const minDisplay = Math.floor((msLeft - Math.floor(hrDisplay*3600000))/60000)
-
-            const secDisplay = Math.floor((msLeft-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-
-            const msDisplay = msLeft - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+            const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(msLeft)
 
             hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
 
@@ -489,6 +517,7 @@ function handleLoopButton(id){
         }, 10)
         loopBtn.classList.toggle("loop")
 
+    // If you want to stop the looping
     }else if(timerContainer.classList.contains("active") && isLooping){
 
             startBtn.setAttribute("data-looping","false")
@@ -498,13 +527,7 @@ function handleLoopButton(id){
             intervalObj[id] = setInterval(()=>{
                 msLeft -= 10
 
-                const hrDisplay = Math.floor(msLeft/3600000)
-
-                const minDisplay = Math.floor((msLeft - Math.floor(hrDisplay*3600000))/60000)
-
-                const secDisplay = Math.floor((msLeft-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-
-                const msDisplay = msLeft - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+                const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(msLeft)
 
                 hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
 
@@ -518,13 +541,7 @@ function handleLoopButton(id){
                 if(msLeft === 0){
                     clearInterval(intervalObj[id])
 
-                    const hrDisplay = Math.floor(msOriginal/3600000)
-
-                    const minDisplay = Math.floor((msOriginal - Math.floor(hrDisplay*3600000))/60000)
-
-                    const secDisplay = Math.floor((msOriginal-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-
-                    const msDisplay = msOriginal - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+                    const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(msOriginal)
 
                     hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
 
@@ -542,6 +559,7 @@ function handleLoopButton(id){
             }, 10)
             if(loopBtn.classList.contains("loop")){
                 loopBtn.classList.toggle("loop")
+                timerContainer.classList.toggle("active")
             }
     }
     // If the timer is not active on press
@@ -561,6 +579,7 @@ function handleDeleteButton(id){
         deleteEl.remove()
         clearInterval(intervalObj[id])
         delete intervalObj[id]
+        delete timerObj[id]
     },650)
 }
 
@@ -610,17 +629,27 @@ function handleRenameSubmit(id){
 }
 
 function handleSaveProfile(name){
-    // grab localstorage so it can be added to
     const profiles = JSON.parse(localStorage.getItem("timers")) || {}
 
+    const saveInput = document.getElementById("profile-save-input")
+
     if(profiles[name]){
-        console.log("this exists")
+        modalErrorMessage(saveInput,"This profile already exists.  Please use the replace or merge button to update the profile.")
+        saveInput.value = name
     }else{
-        profiles[name] = {
-            name: name,
-            timers: timerObj
+        // Create the property first to be able to store
+        if(!profiles[name]){
+            profiles[name] = {}
         }
-        document.querySelector(".modal-background").remove()
+        for(let timer in timerObj){
+            profiles[name][timer] = timerObj[timer]
+        }
+        // profiles[name] = {
+        //     name: name,
+        //     timers: timerObj
+        // }
+        handleCloseModal()
+        handleBottomPopup("success","Success! The profile has been saved.")
     }
     localStorage.setItem("timers", JSON.stringify(profiles))
 }
@@ -631,38 +660,25 @@ function handleLoadProfile(name){
     const loadInput = document.getElementById("profile-load-input")
     const profiles = JSON.parse(localStorage.getItem("timers")) || {}
 
-    console.log(loadInput.classList,loadInput)
-
     if(profiles[name]){
         if(Object.values(timerObj).length > 0){
             for(let item in timerObj){
                 delete timerObj[item]
             }
         }
-        for(let id in profiles[name].timers){
-            timerObj[id] = {...profiles[name].timers[id]}
+        for(let id in profiles[name]){
+            timerObj[id] = {...profiles[name][id]}
         }
+
         modalBackground.remove()
-        handleLoadProfileRender()
-    }else{
-        document.querySelector(".modal").innerHTML += `
-            <p class="not-found loading">Profile name not found.</p>
-        `
-        loadInput.classList.toggle("input-error")
-
-        setTimeout(()=>{
-            document.querySelector(".not-found").remove()
-            // loadInput.classList.toggle("input-error")
-        }, 2000)
-
-        setTimeout(()=>{
-            document.querySelector(".not-found").classList.toggle("deleting")
-        },1500)
+        handleLoadProfileRender(name)
+    }else if(loadInput.value){
+        modalErrorMessage(loadInput, "Profile name not found.")
     }
 
 }
 
-function handleLoadProfileRender(){
+function handleLoadProfileRender(name){
 
     timersContainer.innerHTML = Object.values(timerObj).map(timer => {
         const id = timer.timerId
@@ -721,6 +737,91 @@ function handleLoadProfileRender(){
         
     }, 1500)
 }
+
+function handleCloseModal(){
+    document.querySelector(".modal-background").remove()
+    modalUp = false
+}
+
+function modalErrorMessage(inputEl, message){
+
+    document.querySelector(".modal").innerHTML += `
+            <p class="not-found loading">${message}</p>
+        `
+        inputEl.classList.toggle("input-error")
+
+        setTimeout(()=>{
+            document.querySelector(".not-found").remove()
+        }, 5000)
+
+        setTimeout(()=>{
+            document.querySelector(".not-found").classList.toggle("deleting")
+        },4500)
+}
+
+function handleReplaceButton(name){
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    const saveInput = document.getElementById("profile-save-input")
+
+    if(profiles[name]){
+        profiles[name] = timerObj
+        localStorage.setItem("timers",JSON.stringify(profiles))
+        handleCloseModal()
+        handleBottomPopup("success","Success! The profile has been updated.")
+    }else{
+        modalErrorMessage(saveInput, "Profile name not found.")
+    }
+}
+
+function handleMergeButton(name){
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    const saveInput = document.getElementById("profile-save-input")
+
+    if(profiles[name]){
+        for(let timer in timerObj){
+            profiles[name][timer] = timerObj[timer]
+        }
+        localStorage.setItem("timers", JSON.stringify(profiles))
+        handleCloseModal()
+        handleBottomPopup("success","Success! The profile has been updated.")
+    }else{
+        modalErrorMessage(saveInput, "Profile name not found.")
+    }
+}
+
+function handleBottomPopup(type, message){
+    setTimeout(()=>{
+        const popupEl = document.createElement("div")
+        popupEl.classList.add(`${type}-popup`)
+        popupEl.classList.add("popup")
+        popupEl.setAttribute("id",`${type}-popup`)
+        popupEl.innerText = `${message}`
+        scriptTag.before(popupEl)
+    }, 100)
+
+    setTimeout(()=>{
+        document.getElementById(`${type}-popup`).remove()
+    }, 3000)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// object[property]
 
 // basically tests
 

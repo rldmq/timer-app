@@ -296,27 +296,28 @@ input.clock,
     100%{opacity: 1;}
 }
 
+@keyframes bottomUp{
+    0%{
+        bottom: 5%;
+        opacity: 0;
+    }
+    10%{
+        opacity: 1;
+        bottom: 10%;
+    }
+    75%{
+        opacity: 1;
+        bottom: 10%;
+    }
+    100%{
+        opacity: 0;
+        bottom: 5%;
+    }
+}
+
 /* 
     NOTIFICATIONS / MODALS
 */
-
-
-/* .noTimerNotification{
-    border: 2px solid red;
-    border-radius: 0.5em;
-    padding: 1em;
-    background: rgba(255, 182, 193, 0.556);
-    color: red;
-    margin-top: 3em;
-} */
-
-/* .profileNotification{
-    position: absolute;
-    background: white;
-    border: 5px solid black;
-    padding: 2em;
-} */
-
 .modal-background{
     background: rgba(125,125,125, 0.5);
     position: absolute;
@@ -345,5 +346,27 @@ input.clock,
 
 .input-error{
     border: 1px solid red;
-    /* background: red; */
+}
+
+.popup{
+    padding: 0.5em;
+    border-radius: 1em;
+    background: white;
+    width: fit-content;
+    position: absolute;
+    left: 50%;
+    bottom: 0%;
+    opacity: 0;
+    transform: translate(-50%, 0);
+    animation: 2.5s ease-in-out bottomUp;
+}
+
+.success-popup{
+    color: rgb(11, 123, 11);
+    border: 2px solid rgb(11, 123, 11);
+}
+
+.error-popup{
+    color: rgb(200, 14, 14);
+    border: 2px solid rgb(200, 14, 14);
 }

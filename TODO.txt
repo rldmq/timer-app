@@ -1,6 +1,7 @@
 -start all
 -stop all
 -pause all
+-delete all
 
 -firebase
 
@@ -18,6 +19,10 @@
 
 -issue with name being broken when there are spaces
 
+-load and save profile notification, set so that box does not wiggle
+
+-load and save profile modal styles
+
 Issues:
 -adding a new timer while existing timers are running pauses the existing timers
 
@@ -34,13 +39,19 @@ Mobile: 375×667, 414×736, 360×800, 390×844
 Tablet: 768×1024, 1024×768, 601×962
 
 did today:
-// finish loading
-    // add in cancel
-//finish saving
-    // add in cancel
-    // add in replace
+-fixed timerObj deleting (for saving profiles)
+-added all functionality for load modal (cancel + behaviours)
+-added functionailty for merge and replace
+-added cancel functionality
+-ux improvements
+-success notifcation
+    -success indication for replacing,merging
+-error notification for no timer save
+-added notification for using whitespaces in profile name
+-added keyup for timer creation
 
-Ideas:
-save layout - name
-    -the existing layout will be overridden (y/n)
-    -overwrite, add to, cancel (button options)
+// keyup for creating timers (on the create button)
+// modal should decativate everything on the page
+// delete profile button
+// fix modal inputs being reset when failed
+// visual queue for when timer reaches 0
