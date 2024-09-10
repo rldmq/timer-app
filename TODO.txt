@@ -11,47 +11,30 @@
 
 -add alarm sound option
 
--add function for display calculation (it is very repetitive)
-
--add function for the innerhtml of timers (used by newtimerbtn and loadtimers)
-
--change timer settings grid for desktop view
-
--issue with name being broken when there are spaces
-
--load and save profile notification, set so that box does not wiggle
-
--load and save profile modal styles
-
 Issues:
--adding a new timer while existing timers are running pauses the existing timers
+-adding a new timer while existing timers are running pauses the existing timers (setInterval is still running)
 
 -start > pause > loop (starts the timer but shouldnt)
-
--there is another issue with starting and pausing with a loop option (basically loop is enabled but the timer stops at the end anyway)
 
 Refactor:
 --
 
-Here are some of the most common screen resolutions:
-Desktop: 1920×1080, 1366×768, 1280×1024, 1024×768
-Mobile: 375×667, 414×736, 360×800, 390×844
-Tablet: 768×1024, 1024×768, 601×962
-
 did today:
--fixed timerObj deleting (for saving profiles)
--added all functionality for load modal (cancel + behaviours)
--added functionailty for merge and replace
--added cancel functionality
--ux improvements
--success notifcation
-    -success indication for replacing,merging
--error notification for no timer save
--added notification for using whitespaces in profile name
--added keyup for timer creation
+-refactored code
+    -created function for rendering the timer display, calculating timer milliseconds
+-fixed issue with loopping
+    -added data-attributes to google icon of start button
+-ui/ux improvements
+    -added button indicators for active timer, paused timer, looped timer
+    -added styling to load and save profile modals
+    -key up for create timer input
+-fixed issue with timer names being put on different lines when there is a space
+-added media queries for extra small and extra large screens
 
-// keyup for creating timers (on the create button)
+// issue with resizing profile button
+// inserting new timer resets other timers
 // modal should decativate everything on the page
 // delete profile button
 // fix modal inputs being reset when failed
 // visual queue for when timer reaches 0
+// -,+,.,e keys seem to work for the number input (low priority)

@@ -40,4 +40,9 @@ It's not clear to me why, but explicitly stating that the "modal" will be insert
 
 What is confusing to me is that the modal gets removed even though it is after the script tag, and then it is the removal of the modal element that breaks the rest of the application.
 ------------------------------------------------------------
-5. --
+5. Clicking on the loop button before starting the timer does not loop the timer.  The timer used to be able to loop properly.
+
+The issue was adding the SPAN for the google icons.  The data-attributes had to be added to the google icon for the start button as well.
+------------------------------------------------------------
+6. --
+------------------------------------------------------------

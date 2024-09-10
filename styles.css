@@ -18,6 +18,10 @@
     /* border: 1px solid red; */
 }
 
+button:not(:disabled){
+    cursor: pointer;
+}
+
 /* 
     TYPOGRAPHY
 */
@@ -45,14 +49,6 @@ span.text-small{
     font-size: 1.5rem;
 }
 
-/* .start-btn,
-.pause-btn,
-.reset-btn,
-.loop-btn,
-.delete-btn{
-    
-} */
-
 /* 
     APP
 */
@@ -61,6 +57,7 @@ body{
     height: 100vh;
     display: flex;
     flex-direction: column;
+    background: rgb(235, 235, 235);
 }
 
 main{
@@ -73,14 +70,50 @@ header{
     justify-content: space-between;
 }
 
+.title-container{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+/* 
+    HEADER
+*/
+.profiles-container{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    justify-content: center;
+}
+
+#load-btn,
+#save-btn{
+    height: 1.5em;
+    width: 1.5em;
+    border: 2px solid rgb(219, 219, 219);
+    border-radius: 25%;
+    cursor: pointer;
+    /* transition: width 1s, border-radius 1s; */
+}
+
+#load-btn:hover,
+#save-btn:hover{
+    background: rgb(219, 219, 219);
+}
+
 /* 
     OPTIONS
 */
 
 /* For Chrome */
-/* input[type=number]::-webkit-inner-spin-button{
-    opacity: 1;
-} */
+input[type=number]::-webkit-inner-spin-button{
+    -webkit-appearance: none;
+}
+
+/* For Firefox */
+input[type=number]{
+    -moz-appearance: textfield;
+}
 
 .options--timer-settings{
     margin-top: 0.5em;
@@ -133,6 +166,7 @@ input.options--timer-settings--display--clock-second{
 .clock-divider{
     border-top: 1px solid lightgrey;
     border-bottom: 1px solid lightgrey;
+    background: white;
 }
 
 input.clock,
@@ -164,6 +198,7 @@ input.clock,
 
 #new-btn:hover{
     background: lightgrey;
+    font-weight: 600;
 }
 
 #new-btn:active{
@@ -184,10 +219,16 @@ input.clock,
 .timers--timer{
     padding: 1em;
     border: 1px solid lightgrey;
+    background: rgb(241, 241, 241);
     border-radius: 0.5em;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+}
+
+.timers--timer.active{
+    background: white;
+    border: 1px solid grey;
 }
 
 .timers--timer-name{
@@ -195,7 +236,7 @@ input.clock,
     top: -0.5em;
     text-align: right;
     cursor: url(./assets/images/pencil-icon-half.png) 0 40, auto;
-    width: min-content;
+    width: max-content;
     margin-left: auto;
 }
 
@@ -218,65 +259,191 @@ input.clock,
 .reset-btn,
 .loop-btn,
 .delete-btn{
-    /* width: 4em; */
     height: 2em;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 0.5em;
     flex-grow: 1;
+    border: 1px solid lightgrey;
+}
+
+.start-btn:not(:disabled),
+.pause-btn:not(:disabled),
+.reset-btn:not(:disabled),
+.loop-btn:not(:disabled),
+.delete-btn:not(:disabled){
+    border: 1px solid grey;
+}
+
+.pause-btn:hover:not(:disabled),
+.reset-btn:hover:not(:disabled),
+.loop-btn:hover:not(:disabled),
+.delete-btn:hover:not(:disabled){
+    background: rgb(235, 235, 235);
 }
 
 .paused:disabled{
-    background: lightcoral;
+    background: rgb(255, 185, 185);
+    border: 2px solid rgb(217, 72, 72);
+    color: rgb(217, 72, 72);
 }
 
-.loop{
+.loop-btn.loop{
     background: lightblue;
+    border: 2px solid rgb(85, 85, 192);
+    color: rgb(85, 85, 192);
 }
 
-/*
-    MEDIA QUERIES
+.loop-btn:hover{
+    color: rgb(72, 72, 245);
+}
+
+.loop-btn.loop:hover{
+    /* border: 2px solid rgb(217, 72, 72); */
+    color: rgb(217, 72, 72);
+    background: lightblue;
+
+}
+
+.start-btn:disabled{
+    background: rgb(191, 220, 191);
+    color: rgb(62, 122, 62);
+    border: 2px solid rgb(62, 122, 62);
+}
+
+.start-btn:hover:not(:disabled){
+    color: rgb(22, 183, 22);
+}
+
+.delete-btn:hover:not(:disabled),
+.pause-btn:hover:not(:disabled),
+.reset-btn:hover:not(:disabled){
+    color: rgb(217, 72, 72);
+    font-weight: 700;
+}
+
+
+/* 
+    NOTIFICATIONS / MODALS
 */
-
-/* Mobile: 360px-414px */
-@media screen and (max-width: 414px){
-    
-    .options--timer-settings{
-        grid-template-areas: 
-            "seg1 seg2 seg3 seg4 seg5    "
-            "newname newname newname newname newname"
-            "newbtn newbtn newbtn newbtn newbtn";
-    }
-
-    .timers--timer-el--countdown-container span{
-        font-size: 2.5rem;
-    }
-
-    /* Not sure about this */
-    span.text-small{
-        display: none;
-    }
+.modal-background{
+    background: rgba(125,125,125, 0.5);
+    position: absolute;
+    width: 100vw;
+    height: 100vh;
+    left:0;
+    top: 0;
 }
 
-/* Tablet: 601px-1024px */
-@media screen and (max-width: 1000px){
-    
-    .options--timer-settings{
-        grid-template-areas: 
-            "seg1 seg2 seg3 seg4 seg5    "
-            "newname newname newname newname newname"
-            "newbtn newbtn newbtn newbtn newbtn";
-    }
-
-    .timers--timer-el--countdown-container span:not(.text-small){
-        font-size: 3em;
-    }
+.modal{
+    position: relative;
+    top: 15%;
+    left: 50%;
+    transform: translate(-50%, 0);
+    background: white;
+    width: 20em;
+    padding: 1em;
+    border-radius: 1em;
+    box-shadow: 0 0 1em 0.25em grey;
 }
 
-/* Desktop: 1024px and above */
-@media screen and (min-width: 1024px){
+.load-modal{
+    display: grid;
+    grid-template-areas: 
+        "msg msg"
+        "input input"
+        "load cancel"
+        "error error";
+    gap: 0.5em;
+}
 
-    
+.save-modal{
+    display: grid;
+    grid-template-areas: 
+    "msg msg msg msg"
+    "input input input input"
+    "save replace merge cancel"
+    "error error error error";
+    gap: 0.5em;
+}
+
+.modal-msg{
+    grid-area: msg;
+}
+
+.modal-btn{
+    padding: 0.25em;
+    border: 2px solid rgb(150, 150, 150);
+    border-radius: 0.4em;
+}
+
+.modal-btn:hover{
+    background: rgb(209, 209, 209);
+}
+
+.modal-btn:active{
+    transform: translate(1px, 1px);
+}
+
+#profile-load-input,
+#profile-save-input{
+    grid-area: input;
+    padding: 0.5em;
+    border: 2px solid rgb(150, 150, 150);
+    border-radius: 0.4em;
+}
+
+#profile-load-btn{
+    grid-area: load;
+}
+
+#profile-cancel-btn{
+    grid-area: cancel;
+}
+
+#profile-save-btn{
+    grid-area: save;
+}
+
+#profile-replace-btn{
+    grid-area: replace;
+}
+
+#profile-merge-btn{
+    grid-area: merge;
+}
+
+.not-found{
+    color: red;
+    grid-area: error;
+}
+
+.input-error{
+    border: 1px solid red;
+}
+
+.popup{
+    padding: 0.5em;
+    border-radius: 1em;
+    background: white;
+    width: fit-content;
+    position: absolute;
+    left: 50%;
+    bottom: 0%;
+    opacity: 0;
+    transform: translate(-50%, 0);
+    animation: 2.5s ease-in-out bottomUp;
+}
+
+.success-popup{
+    color: rgb(11, 123, 11);
+    border: 2px solid rgb(11, 123, 11);
+}
+
+.error-popup{
+    color: rgb(200, 14, 14);
+    border: 2px solid rgb(200, 14, 14);
 }
 
 /* 
@@ -315,58 +482,98 @@ input.clock,
     }
 }
 
-/* 
-    NOTIFICATIONS / MODALS
+/*
+    MEDIA QUERIES
+    Common screen resolutions:
+    Desktop: 1920×1080, 1366×768, 1280×1024, 1024×768
+    Mobile: 375×667, 414×736, 360×800, 390×844
+    Tablet: 768×1024, 1024×768, 601×962
 */
-.modal-background{
-    background: rgba(125,125,125, 0.5);
-    position: absolute;
-    width: 100vw;
-    height: 100vh;
-    left:0;
-    top: 0;
+
+/* Mobile: 360px-414px */
+@media screen and (max-width: 414px){
+    
+    .options--timer-settings{
+        grid-template-areas: 
+            "seg1 seg2 seg3 seg4 seg5    "
+            "newname newname newname newname newname"
+            "newbtn newbtn newbtn newbtn newbtn";
+    }
+
+    .timers--timer-el--countdown-container span{
+        font-size: 2.5rem;
+    }
+
+    /* Not sure about this */
+    span.text-small{
+        display: none;
+    }
+
+    .app-description{
+        display: none;
+    }
+
+    .app-title{
+        font-size: 3rem;
+    }
 }
 
-.modal{
-    position: relative;
-    top: 15%;
-    left: 50%;
-    transform: translate(-50%, 0);
-    background: white;
-    width: fit-content;
-    height: fit-content;
-    padding: 2em;
-    border-radius: 1em;
-    box-shadow: 0 0 1em 0.25em grey;
+/* Custom: for stretching browsers too small */
+@media screen and (max-width: 475px){
+    .app-description{
+        max-width: 18em;
+    }
 }
 
-.not-found{
-    color: red;
+/* Tablet: 601px-1024px */
+@media screen and (max-width: 1000px){
+    
+    .options--timer-settings{
+        grid-template-areas: 
+            "seg1 seg2 seg3 seg4 seg5    "
+            "newname newname newname newname newname"
+            "newbtn newbtn newbtn newbtn newbtn";
+    }
+
+    .timers--timer-el--countdown-container span:not(.text-small){
+        font-size: 3em;
+    }
 }
 
-.input-error{
-    border: 1px solid red;
+/* Desktop: 1024px and above */
+@media screen and (min-width: 1024px){
+
+    
 }
 
-.popup{
-    padding: 0.5em;
-    border-radius: 1em;
-    background: white;
-    width: fit-content;
-    position: absolute;
-    left: 50%;
-    bottom: 0%;
-    opacity: 0;
-    transform: translate(-50%, 0);
-    animation: 2.5s ease-in-out bottomUp;
-}
+/* Custom: Really wide viewport */
+@media screen and (min-width: 1100px){
+    body{
+        width: 1100px;
+        align-items: center;
+        margin: auto;
+    }
 
-.success-popup{
-    color: rgb(11, 123, 11);
-    border: 2px solid rgb(11, 123, 11);
-}
+    header{
+        width: 100%;
+    }
 
-.error-popup{
-    color: rgb(200, 14, 14);
-    border: 2px solid rgb(200, 14, 14);
+    #load-btn,
+    #save-btn{
+        width: 9em;
+        height: 2em;
+        border-radius: 0.75em;
+        display: flex;
+        align-items: center;
+        border-color: rgb(204, 202, 202);
+        font-weight: 500;
+    }
+
+    .profile-btn-text{
+        margin-left: 1em;
+    }
+
+    .material-symbols-outlined{
+        color: rgb(110, 110, 110);
+    }
 }

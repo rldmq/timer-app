@@ -23,6 +23,51 @@ let activeEl
 let activeElVal
 
 // EVENT LISTENERS
+// Listen for changing the save and load profile buttons
+    window.addEventListener("resize", ()=>{
+        console.log("resize")
+        profileButtonsDisplay()
+    })
+
+    window.addEventListener("refresh", ()=>{
+        profileButtonsDisplay()
+        console.log("refresh")
+    })
+
+    window.addEventListener("load", ()=>{
+        console.log("load")
+        if(window.innerWidth >= 1100){
+            loadBtn.classList.remove("material-symbols-outlined")
+            saveBtn.classList.remove("material-symbols-outlined")
+        
+            loadBtn.classList.add("no-google-icon")
+            saveBtn.classList.add("no-google-icon")
+        
+            loadBtn.innerHTML = `<span class="profile-btn-text">Load Profile</span>`
+            saveBtn.innerHTML = `<span class="profile-btn-text">Save Profile</span>`
+        
+            loadBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
+            saveBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
+        
+            loadBtn.style.justifyContent = "space-between"
+            saveBtn.style.justifyContent = "space-between"
+        }else{
+            loadBtn.classList.add("material-symbols-outlined")
+            saveBtn.classList.add("material-symbols-outlined")
+
+            loadBtn.classList.remove("no-google-icon")
+            saveBtn.classList.remove("no-google-icon")
+
+            loadBtn.innerText = "person"
+            saveBtn.innerText = "save"
+
+            // loadBtn.style = loadBtn.style
+            // saveBtn.style = loadBtn.style
+
+            loadBtn.style = loadBtn.style.transition = ""
+            saveBtn.style = loadBtn.style.transition = ""
+        }
+    })
 
 // Button for load profiles modal
 loadBtn.addEventListener("click",(e)=>{
@@ -32,7 +77,7 @@ loadBtn.addEventListener("click",(e)=>{
     modalContainer.innerHTML = 
     `
     <div class="modal load-modal">
-        <p>Enter the profile name to load:</p>
+        <p class="modal-msg">Enter the profile name to load:</p>
         <input type="text" placeholder="Profile name" id="profile-load-input"/>
         <button id="profile-load-btn" class="modal-btn">Load</button>
         <button id="profile-cancel-btn" class="modal-btn">Cancel</button>
@@ -56,7 +101,7 @@ saveBtn.addEventListener("click",(e)=>{
         modalContainer.innerHTML = 
         `
         <div class="modal save-modal">
-            <p>Enter the profile name to save:</p>
+            <p class="modal-msg">Enter the profile name to save:</p>
             <input type="text" placeholder="Profle name" id="profile-save-input"/>
             <button id="profile-save-btn" class="modal-btn">Save</button>
             <button id="profile-replace-btn" class="modal-btn">Replace</button>
@@ -175,7 +220,7 @@ appHtml.addEventListener("keyup",(e)=>{
         }
 
         if(e.target.getAttribute("id") === "timer-name"){
-            console.log("this is basically newTimerBtn.addEventListener(click, ()=>{})")
+            handleCreateTimer()
         }
     }
 
@@ -245,46 +290,8 @@ function handleCreateTimer(){
 
     if((defaultHr + defaultMin + defaultSec) > 0){
 
-        timersContainer.innerHTML += 
-        `<div 
-        data-timerNumber="${id}"
-        data-default-hr="${defaultHr}"
-        data-default-min="${defaultMin}"
-        data-default-sec="${defaultSec}"
-        data-name="${timerName}"
-        class="timers--timer-el-${id} timers--timer"
-        >
-            <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${timerName}</span>
-            <div class="timers--timer-el--countdown-container">
-                <span id="${id}-hr">${defaultHr}</span>
-                <span>:</span>
-                <span id="${id}-min">${defaultMin}</span>
-                <span>:</span>
-                <span id="${id}-sec">${defaultSec}</span>
-                <span class="text-small">.</span>
-                <span id="${id}-ms" class="text-small">000</span>
-            </div>
-            <div class="timers--timer-el--timer-options">
-                <button data-start="${id}" data-looping="false" class="start-btn ${id}">
-                    <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" >
-                    arrow_right</span>
-                </button>
-                <button data-pause="${id}" class="pause-btn ${id}" disabled>
-                    <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
-                    pause</span>
-                </button>
-                <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
-                <button data-loop="${id}" class="loop-btn ${id}">
-                    <span class="material-symbols-outlined" data-loop="${id}">
-                    restart_alt</span>
-                </button>
-                <button data-delete="${id}" class="delete-btn">
-                    <span class="material-symbols-outlined" data-delete="${id}">
-                    delete_forever</span>
-                </button>
-            </div>
-        </div>`
-        // not sure if data-id is needed by all buttons
+        timersContainer.innerHTML += timerRender(id, timerName, defaultHr, defaultMin, defaultSec)
+
         document.getElementById("hour").value = ""
         document.getElementById("minute").value = ""
         document.getElementById("second").value = ""
@@ -302,16 +309,46 @@ function handleCreateTimer(){
     timerObj[id].timerId = id
 }
 
-function timerDisplayCalculation(totalMs){
-    const hrDisplay = Math.floor(totalMs/3600000)
-
-    const minDisplay = Math.floor((totalMs - Math.floor(hrDisplay*3600000))/60000)
-
-    const secDisplay = Math.floor((totalMs-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-
-    const msDisplay = totalMs - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
-
-    return [hrDisplay, minDisplay, secDisplay, msDisplay]
+function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, loading = false){
+    return (`<div 
+        data-timerNumber="${id}"
+        data-default-hr="${defaultHr}"
+        data-default-min="${defaultMin}"
+        data-default-sec="${defaultSec}"
+        data-name="${timerName}"
+        class="timers--timer-el-${id} timers--timer ${loading ? "loading" : ""}"
+        >
+            <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${timerName}</span>
+            <div class="timers--timer-el--countdown-container">
+                <span id="${id}-hr">${defaultHr}</span>
+                <span>:</span>
+                <span id="${id}-min">${defaultMin}</span>
+                <span>:</span>
+                <span id="${id}-sec">${defaultSec}</span>
+                <span class="text-small">.</span>
+                <span id="${id}-ms" class="text-small">000</span>
+            </div>
+            <div class="timers--timer-el--timer-options">
+                <button data-start="${id}" data-looping="false" class="start-btn ${id}">
+                    <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" data-looping="false" id="start-span-${id}">
+                    arrow_right</span>
+                </button>
+                <button data-pause="${id}" class="pause-btn ${id}" disabled>
+                    <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
+                    pause</span>
+                </button>
+                <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
+                <button data-loop="${id}" class="loop-btn ${id}">
+                    <span class="material-symbols-outlined" data-loop="${id}">
+                    restart_alt</span>
+                </button>
+                <button data-delete="${id}" class="delete-btn">
+                    <span class="material-symbols-outlined" data-delete="${id}">
+                    delete_forever</span>
+                </button>
+            </div>
+        </div>`)
+        // not sure if data-id is needed by all buttons
 }
 
 function handleStartButton(id, loop){
@@ -329,9 +366,9 @@ function handleStartButton(id, loop){
     const secEl = document.getElementById(`${id}-sec`)
     const msEl = document.getElementById(`${id}-ms`)
 
-    let totalMillisec = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000 + msEl.innerHTML*1
+    let totalMillisec = calculateMs(hrEl, minEl, secEl, msEl)
 
-    const originalTime = (timerContainer.getAttribute("data-default-hr")*3600000) + (timerContainer.getAttribute("data-default-min")*60000) + timerContainer.getAttribute("data-default-sec")*1000
+    const originalTime = getOriginalTime(timerContainer)
 
     if(pauseBtn.hasAttribute("disabled") && !pauseBtn.classList.contains("paused")){
         pauseBtn.toggleAttribute("disabled")
@@ -348,32 +385,16 @@ function handleStartButton(id, loop){
 
         totalMillisec -= 10
 
-        const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(totalMillisec)
-
-        hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay 
-        : hrDisplay
-
-        minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay 
-        : minDisplay
-
-        secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay 
-        : secDisplay
-
-        msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay
-        : msDisplay
+        setTimerDisplay(totalMillisec, hrEl, minEl, secEl, msEl)
 
         if(totalMillisec === 0){
+            console.log(loop)
             if(loop === "true"){
                 totalMillisec = originalTime
             }else{
                 clearInterval(intervalObj[id])
 
-                const [hrDisplayEnd, minDisplayEnd, secDisplayEnd, msDisplayEnd] = timerDisplayCalculation(originalTime)
-
-                hrEl.innerHTML = hrDisplayEnd < 10 ? "0" + hrDisplayEnd : hrDisplayEnd
-                minEl.innerHTML = minDisplayEnd < 10 ? "0" + minDisplayEnd : minDisplayEnd
-                secEl.innerHTML = secDisplayEnd < 10 ? "0" + secDisplayEnd : secDisplayEnd
-                msEl.innerHTML = msDisplayEnd == 0 ? "00" + msDisplayEnd : msDisplayEnd < 100 ? "0" + msDisplayEnd : msDisplayEnd
+                setTimerDisplay(originalTime, hrEl, minEl, secEl, msEl)
 
                 pauseBtn.toggleAttribute("disabled")
                 resetBtn.toggleAttribute("disabled")
@@ -393,6 +414,32 @@ function handleStartButton(id, loop){
         timerContainer.classList.toggle("active")
     }
 
+}
+
+function calculateMs(hourEl, minEl, secEl, msEl){
+    return ((hourEl.innerHTML*3600000) + (minEl.innerHTML*60000) + (secEl.innerHTML*1000) + (msEl.innerHTML*1))
+}
+
+function getOriginalTime(container){
+    return ((container.getAttribute("data-default-hr")*3600000) + (container.getAttribute("data-default-min")*60000) + (container.getAttribute("data-default-sec")*1000))
+}
+
+function setTimerDisplay(totalMs, hourEl, minuteEl, secondEl, msEl){
+    const hrDisplay = Math.floor(totalMs/3600000)
+
+    const minDisplay = Math.floor((totalMs - Math.floor(hrDisplay*3600000))/60000)
+
+    const secDisplay = Math.floor((totalMs-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
+
+    const msDisplay = totalMs - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+
+    hourEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
+
+    minuteEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
+
+    secondEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
+
+    msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay: msDisplay < 100 ? "0" + msDisplay : msDisplay
 }
 
 function handlePauseButton(id){
@@ -473,6 +520,8 @@ function handleLoopButton(id){
     
     const startBtn = document.querySelector(`.start-btn.${id}`)
 
+    const startBtnSpan = document.getElementById(`start-span-${id}`)
+
     const pauseBtn = document.querySelector(`.pause-btn.${id}`)
 
     const resetBtn = document.querySelector(`.reset-btn.${id}`)
@@ -486,30 +535,22 @@ function handleLoopButton(id){
     const secEl = document.getElementById(`${id}-sec`)
     const msEl = document.getElementById(`${id}-ms`)
 
-    let msLeft = (hrEl.innerHTML*3600000) + (minEl.innerHTML*60000) + secEl.innerHTML*1000 + msEl.innerHTML*1
+    let msLeft = calculateMs(hrEl, minEl, secEl, msEl)
 
-    const msOriginal = (timerContainer.getAttribute("data-default-hr")*3600000) + (timerContainer.getAttribute("data-default-min")*60000) + timerContainer.getAttribute("data-default-sec")*1000
+    const msOriginal = getOriginalTime(timerContainer)
 
     // If the timer is active on press
     if(timerContainer.classList.contains("active") && !isLooping){
 
         startBtn.setAttribute("data-looping","true")
+        startBtnSpan.setAttribute("data-looping","true")
 
         clearInterval(intervalObj[id])
 
         intervalObj[id] = setInterval(()=>{
             msLeft -= 10
 
-            const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(msLeft)
-
-            hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
-
-            minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
-
-            secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
-
-            msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay : msDisplay
-
+            setTimerDisplay(msLeft, hrEl, minEl, secEl, msEl)
 
             if(msLeft === 0){
                 msLeft = msOriginal
@@ -521,36 +562,19 @@ function handleLoopButton(id){
     }else if(timerContainer.classList.contains("active") && isLooping){
 
             startBtn.setAttribute("data-looping","false")
+            startBtnSpan.setAttribute("data-looping","false")
 
             clearInterval(intervalObj[id])
 
             intervalObj[id] = setInterval(()=>{
                 msLeft -= 10
 
-                const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(msLeft)
-
-                hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
-
-                minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
-
-                secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
-
-                msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay : msDisplay < 100 ? "0" + msDisplay : msDisplay
-
+                setTimerDisplay(msLeft, hrEl, minEl, secEl, msEl)
 
                 if(msLeft === 0){
                     clearInterval(intervalObj[id])
 
-                    const [hrDisplay, minDisplay, secDisplay, msDisplay] = timerDisplayCalculation(msOriginal)
-
-                    hrEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
-
-                    minEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
-
-                    secEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
-
-                    msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay: msDisplay < 100 ? "0" + msDisplay : msDisplay
-
+                    setTimerDisplay(msOriginal, hrEl, minEl, secEl, msEl)
 
                     startBtn.toggleAttribute("disabled")
                     pauseBtn.toggleAttribute("disabled")
@@ -564,7 +588,8 @@ function handleLoopButton(id){
     }
     // If the timer is not active on press
     else{
-        startBtn.setAttribute("data-looping", !isLooping)
+        startBtn.setAttribute("data-looping", String(!isLooping))
+        startBtnSpan.setAttribute("data-looping", String(!isLooping))
         loopBtn.classList.toggle("loop")
     }
 }
@@ -634,7 +659,7 @@ function handleSaveProfile(name){
     const saveInput = document.getElementById("profile-save-input")
 
     if(profiles[name]){
-        modalErrorMessage(saveInput,"This profile already exists.  Please use the replace or merge button to update the profile.")
+        modalErrorMessage(saveInput,"This profile already exists. Please use the replace or merge button to update the profile.")
         saveInput.value = name
     }else{
         // Create the property first to be able to store
@@ -687,44 +712,7 @@ function handleLoadProfileRender(name){
         const min = timer.defaultMin
         const sec = timer.defaultSec
 
-        return ( `<div 
-            data-timerNumber="${id}"
-            data-default-hr="${hr}"
-            data-default-min="${min}"
-            data-default-sec="${sec}"
-            data-name="${name}"
-            class="timers--timer-el-${id} timers--timer loading"
-            >
-            <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${name}</span>
-            <div class="timers--timer-el--countdown-container">
-            <span id="${id}-hr">${hr}</span>
-            <span>:</span>
-            <span id="${id}-min">${min}</span>
-            <span>:</span>
-            <span id="${id}-sec">${sec}</span>
-            <span class="text-small">.</span>
-            <span id="${id}-ms" class="text-small">000</span>
-            </div>
-            <div class="timers--timer-el--timer-options">
-            <button data-start="${id}" data-looping="false" class="start-btn ${id}">
-            <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" >
-            arrow_right</span>
-            </button>
-            <button data-pause="${id}" class="pause-btn ${id}" disabled>
-            <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
-            pause</span>
-            </button>
-            <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
-            <button data-loop="${id}" class="loop-btn ${id}">
-            <span class="material-symbols-outlined" data-loop="${id}">
-            restart_alt</span>
-            </button>
-            <button data-delete="${id}" class="delete-btn">
-            <span class="material-symbols-outlined" data-delete="${id}">
-            delete_forever</span>
-            </button>
-            </div>
-            </div>`)
+        return ( timerRender(id, name, hr, min, sec, true))
     }).join("")
 
     // Remove the "loading" class
@@ -806,107 +794,76 @@ function handleBottomPopup(type, message){
     }, 3000)
 }
 
+function profileButtonsDisplay(){
+    if(window.innerWidth >= 1100 && loadBtn.classList.contains("material-symbols-outlined")){
+        console.log("ran")
+        loadBtn.classList.remove("material-symbols-outlined")
+        saveBtn.classList.remove("material-symbols-outlined")
 
+        loadBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
+        saveBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
 
+        loadBtn.style.justifyContent = "end"
+        saveBtn.style.justifyContent = "end"
 
+        loadBtn.style.transiton = "width 1s"
+        saveBtn.style.transiton = "width 1s"
 
+        setTimeout(()=>{
 
+            loadBtn.classList.add("no-google-icon")
+            saveBtn.classList.add("no-google-icon")
 
+            loadBtn.innerHTML = `<span class="profile-btn-text">Load Profile</span>`
+            saveBtn.innerHTML = `<span class="profile-btn-text">Save Profile</span>`
 
+            loadBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
+            saveBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
 
+            loadBtn.style.justifyContent = "space-between"
+            saveBtn.style.justifyContent = "space-between"
 
+        }, 1000)
+        
+    }else if(window.innerWidth < 1100 && !loadBtn.classList.contains("material-symbols-outlined")){
 
+        loadBtn.classList.add("material-symbols-outlined")
+        saveBtn.classList.add("material-symbols-outlined")
 
+        loadBtn.classList.remove("no-google-icon")
+        saveBtn.classList.remove("no-google-icon")
 
+        loadBtn.innerText = "person"
+        saveBtn.innerText = "save"
 
-
-
-// object[property]
-
-// basically tests
-
-// function handleEmptyStorageNotification(){
-//     timersContainer.innerHTML = `<div class="noTimerNotification loading">There are no timers saved in storage.</div>`
-
-//     setTimeout(()=>{
-//         const notificationEl = document.querySelector(".noTimerNotification")
-
-//         notificationEl.classList.toggle("loading")
-//         notificationEl.classList.toggle("deleting")
-//     }, 1500)
-
-//     setTimeout(()=>{
-//         timersContainer.innerHTML = ""
-//     },2000)
-// }
-
-document.getElementById("logObj").addEventListener("click", (e)=>{
-    console.log(timerObj)
-})
-
-document.getElementById("logId").addEventListener("click", (e)=>{
-    const localStorObj = JSON.parse(localStorage.getItem("timers"))
-    console.log(localStorObj)
-})
-
-document.getElementById("clearLoc").addEventListener("click",()=>{
-    localStorage.clear()
-
-    for(let timer in timerObj){
-        delete timerObj[timer]
+        loadBtn.style = loadBtn.style
+        saveBtn.style = saveBtn.style
+        
+        loadBtn.style.transition = "width 1s, border-radius 1s"
+        saveBtn.style.transition = "width 1s, border-radius 1s"
     }
-})
+}
 
+/**
+ * TEST AREA
+ */
+// document.getElementById("logObj").addEventListener("click", (e)=>{
+//     console.log(timerObj)
+// })
 
-// Testing area
-const testObj = {}
+// document.getElementById("logId").addEventListener("click", (e)=>{
+//     const localStorObj = JSON.parse(localStorage.getItem("timers"))
+//     console.log(localStorObj)
+// })
 
-document.getElementById("save-profile-form").addEventListener("submit",(e)=>{
-    e.preventDefault()
-    const profileName = document.querySelector(".save-profile-input").value
+// document.getElementById("clearLoc").addEventListener("click",()=>{
+//     localStorage.clear()
 
-    if(testObj[profileName]){
-        // pop up
-        document.getElementById("body").innerHTML += 
-        `
-        <div class="profileNotification">
-            <p>This profile already exists.  Select an option:</p>
-            <button id="test-replace" data-function="replace">Replace</button>
-            <button id="test-add" data-function="add">Add</button>
-            <button id="test-cancel" data-function="cancel">Cancel</button>
-        </div>
-        `
-        // add to profile, replace profile, cancel
-    }else if(profileName){
-        testObj[`${profileName}`] = {
-            "iamhim" : uniqueId(),
-            "purplelean" : uniqueId(),
-            "opps" : uniqueId(),
-        }
+//     // for(let timer in timerObj){
+//     //     delete timerObj[timer]
+//     // }
+// })
 
-        document.querySelector(".save-profile-input").value = ""
-    }
-})
-
-document.getElementById("logtestobj").addEventListener("click",()=>{
-    console.log(testObj)
-})
-
-document.getElementById("body").addEventListener("click",(e)=>{
-
-    const modal = document.querySelector(".profileNotification")
-
-    if(e.target.getAttribute("data-function")==="replace"){
-        console.log("replacing")
-
-        modal.remove()
-    }
-    if(e.target.getAttribute("data-function")==="add"){
-        console.log("adding")
-        modal.remove()
-    }
-    if(e.target.getAttribute("data-function")==="cancel"){
-        console.log("cancelling")
-        modal.remove()
-    }
-})
+// document.getElementById("logInterval").addEventListener("click", ()=>{
+//     console.log(intervalObj)
+// })

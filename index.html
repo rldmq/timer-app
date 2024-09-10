@@ -9,6 +9,22 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
         <!-- Google Symbols -->
+        <!-- Load -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+        <!-- Save -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+
+        <!-- <style>
+            .material-symbols-outlined {
+              font-variation-settings:
+              'FILL' 0,
+              'wght' 400,
+              'GRAD' 0,
+              'opsz' 24
+            }
+        </style> -->
+
         <!-- Play -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
@@ -34,13 +50,13 @@
     </head>
     <body id="body">
         <header>
-            <div>
+            <div class="title-container">
                 <h1 class="app-title">Timer App</h1>
                 <p class="app-description">Create and run multiple timers in a single app.</p>
             </div>
             <div class="profiles-container">
-                <button id="load-btn">Load Profile</button>
-                <button id="save-btn">Save Profile</button>
+                <button id="load-btn" class=""></button>
+                <button id="save-btn" class=""></button>
             </div>
         </header>
         <main>
@@ -66,29 +82,20 @@
                         </label>
                     </div>
                     <label for="timer-name" class="label" id="timer-name-label">
-                        <input id="timer-name" type="text" placeholder="Activity X Timer"/>
+                        <input id="timer-name" type="text" placeholder="Timer Name: Eat a singular chip timer, Time for crab..." maxlength="30"/>
                     </label>
                     <button id="new-btn">Create</button>
                 </div>
             </section>
 
             <!-- TEMP AREA -->
-            <section>
+            <!-- <section>
                 <h3>Temp Area</h3>
                 <button id="logObj">Log Obj</button>
                 <button id="logId">Log Local Storage</button>
                 <button id="clearLoc">Clear Local Storage</button>
-                <button id="load-bt">Load Timers</button>
-                <button id="save-bt">Save Timers</button>
-            </section>
-            <section>
-                <h3>Temp Area 2</h3>
-                <form id="save-profile-form">
-                    <input type="text" placeholder="Profile Name" class="save-profile-input"/>
-                    <button class="save-profile-btn">Save</button>
-                </form>
-                <button id="logtestobj">log test obj</button>
-            </section>
+                <button id="logInterval">Log Interval</button>
+            </section> -->
             <!-- TEMP AREA -->
 
             <section class="timers">
