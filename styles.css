@@ -73,7 +73,8 @@ header{
 .title-container{
     display: flex;
     flex-direction: column;
-    justify-content: space-around;
+    justify-content: center;
+    gap: 0.5em;
 }
 
 /* 
@@ -87,17 +88,18 @@ header{
 }
 
 #load-btn,
-#save-btn{
+#save-btn,
+#delete-btn{
     height: 1.5em;
     width: 1.5em;
     border: 2px solid rgb(219, 219, 219);
     border-radius: 25%;
     cursor: pointer;
-    /* transition: width 1s, border-radius 1s; */
 }
 
 #load-btn:hover,
-#save-btn:hover{
+#save-btn:hover,
+#delete-btn:hover{
     background: rgb(219, 219, 219);
 }
 
@@ -123,7 +125,6 @@ input[type=number]{
         "seg1 seg2 seg3 seg4 seg5"
         "newbtn newbtn newbtn newbtn newbtn";
     row-gap: 0.5em;
-
 }
 
 .countdown-segment1{
@@ -283,46 +284,59 @@ input.clock,
     background: rgb(235, 235, 235);
 }
 
+.delete-btn:hover:not(:disabled) span,
+.pause-btn:hover:not(:disabled) span,
+.reset-btn:hover:not(:disabled){
+    color: rgb(217, 72, 72);
+    font-weight: 500;
+}
+
+.pause-btn:disabled span{
+    color: lightgrey;
+}
+
 .paused:disabled{
     background: rgb(255, 185, 185);
     border: 2px solid rgb(217, 72, 72);
+}
+
+.paused:disabled span{
     color: rgb(217, 72, 72);
+}
+
+.loop-btn:hover span{
+    color: rgb(85, 85, 192);
 }
 
 .loop-btn.loop{
     background: lightblue;
     border: 2px solid rgb(85, 85, 192);
+}
+
+.loop-btn.loop span{
     color: rgb(85, 85, 192);
 }
 
-.loop-btn:hover{
-    color: rgb(72, 72, 245);
+.loop-btn.loop:hover{
+    background: lightblue;
 }
 
-.loop-btn.loop:hover{
-    /* border: 2px solid rgb(217, 72, 72); */
+.loop-btn.loop:hover span{
     color: rgb(217, 72, 72);
-    background: lightblue;
-
 }
 
 .start-btn:disabled{
     background: rgb(191, 220, 191);
-    color: rgb(62, 122, 62);
     border: 2px solid rgb(62, 122, 62);
 }
 
-.start-btn:hover:not(:disabled){
+.start-btn:disabled span{
+    color: rgb(62, 122, 62);
+}
+
+.start-btn:hover:not(:disabled) span{
     color: rgb(22, 183, 22);
-}
-
-.delete-btn:hover:not(:disabled),
-.pause-btn:hover:not(:disabled),
-.reset-btn:hover:not(:disabled){
-    color: rgb(217, 72, 72);
-    font-weight: 700;
-}
-
+} 
 
 /* 
     NOTIFICATIONS / MODALS
@@ -368,6 +382,16 @@ input.clock,
     gap: 0.5em;
 }
 
+.delete-modal{
+    display: grid;
+    grid-template-areas:
+    "msg msg"
+    "input input"
+    "delete cancel"
+    "error error";
+    gap: 0.5em;
+}
+
 .modal-msg{
     grid-area: msg;
 }
@@ -387,7 +411,8 @@ input.clock,
 }
 
 #profile-load-input,
-#profile-save-input{
+#profile-save-input,
+#profile-delete-input{
     grid-area: input;
     padding: 0.5em;
     border: 2px solid rgb(150, 150, 150);
@@ -414,13 +439,17 @@ input.clock,
     grid-area: merge;
 }
 
+#profile-delete-btn{
+    grid-area: delete;
+}
+
 .not-found{
     color: red;
     grid-area: error;
 }
 
 .input-error{
-    border: 1px solid red;
+    border: 1px solid red !important;
 }
 
 .popup{
@@ -559,8 +588,9 @@ input.clock,
     }
 
     #load-btn,
-    #save-btn{
-        width: 9em;
+    #save-btn,
+    #delete-btn{
+        width: 9.8em;
         height: 2em;
         border-radius: 0.75em;
         display: flex;

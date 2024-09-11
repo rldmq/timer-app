@@ -1,9 +1,7 @@
 -start all
--stop all
+-reset all
 -pause all
 -delete all
-
--firebase
 
 -edit timer settings 
 
@@ -14,27 +12,25 @@
 Issues:
 -adding a new timer while existing timers are running pauses the existing timers (setInterval is still running)
 
--start > pause > loop (starts the timer but shouldnt)
+a combination of starting pausing and looping starts the timer when it shouldn't (when loop is toggled)
 
 Refactor:
 --
 
 did today:
--refactored code
-    -created function for rendering the timer display, calculating timer milliseconds
--fixed issue with loopping
-    -added data-attributes to google icon of start button
--ui/ux improvements
-    -added button indicators for active timer, paused timer, looped timer
-    -added styling to load and save profile modals
-    -key up for create timer input
--fixed issue with timer names being put on different lines when there is a space
--added media queries for extra small and extra large screens
+-fixed profile button resizing (still issue with >1100 width)
+-fixed hovering color issue for timers
+-removed local storage and integrated firebase
+-added delete profile functionality
+-added loop to timerobj so that loop state is saved
 
-// issue with resizing profile button
-// inserting new timer resets other timers
+
+// there is an issue with adding a red box around the save and load modals.  it seems like because of the innerHTML +=, it is refreshing the page.  If you log the input element and try to select it, it says that it does not exist
+// add: inserting new timer resets other timers
 // modal should decativate everything on the page
-// delete profile button
-// fix modal inputs being reset when failed
+// fix modal inputs being reset when profile not found
 // visual queue for when timer reaches 0
 // -,+,.,e keys seem to work for the number input (low priority)
+
+Tests:
+-save while timers are running

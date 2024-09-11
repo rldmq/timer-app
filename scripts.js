@@ -1,3 +1,7 @@
+// FIREBASE
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js"
+import { getDatabase, ref, set, get, remove} from "https://www.gstatic.com/firebasejs/10.8.1/firebase-database.js"
+
 // IMPORTS
 import uniqueId from "./utils.js"
 
@@ -5,6 +9,13 @@ import uniqueId from "./utils.js"
 const intervalObj = {}
 
 // VARIABLES
+const firebaseConfig = {
+    databaseURL: "https://timer-app-f13e4-default-rtdb.firebaseio.com/",
+}
+
+const app = initializeApp(firebaseConfig)
+const database = getDatabase(app)
+
 const timerObj = {}
 
 let modalUp = false
@@ -13,6 +24,7 @@ const appHtml = document.getElementById("app-html")
 const newTimerBtn = document.getElementById("new-btn")
 const loadBtn = document.getElementById("load-btn")
 const saveBtn = document.getElementById("save-btn")
+const deleteBtn = document.getElementById("delete-btn")
 const scriptTag = document.getElementsByTagName("script")[0]
 
 const timersContainer = document.querySelector(".timers")
@@ -23,53 +35,108 @@ let activeEl
 let activeElVal
 
 // EVENT LISTENERS
-// Listen for changing the save and load profile buttons
+// For changing the save and load profile buttons
     window.addEventListener("resize", ()=>{
-        console.log("resize")
-        profileButtonsDisplay()
-    })
-
-    window.addEventListener("refresh", ()=>{
-        profileButtonsDisplay()
-        console.log("refresh")
-    })
-
-    window.addEventListener("load", ()=>{
-        console.log("load")
-        if(window.innerWidth >= 1100){
+        if(window.innerWidth >= 1100 && loadBtn.classList.contains("material-symbols-outlined")){
             loadBtn.classList.remove("material-symbols-outlined")
             saveBtn.classList.remove("material-symbols-outlined")
+            deleteBtn.classList.remove("material-symbols-outlined")
+    
+            loadBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
+            saveBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
+            deleteBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">delete</span>`
+    
+            loadBtn.style.justifyContent = "end"
+            saveBtn.style.justifyContent = "end"
+            deleteBtn.style.justifyContent = "end"
+    
+            loadBtn.style.transition = "width 1s"
+            saveBtn.style.transition = "width 1s"
+            deleteBtn.style.transition = "width 1s"
+    
+            setTimeout(()=>{
+    
+                loadBtn.classList.add("no-google-icon")
+                saveBtn.classList.add("no-google-icon")
+                deleteBtn.classList.add("no-google-icon")
+    
+                loadBtn.innerHTML = `<span class="profile-btn-text">Load Profile</span>`
+                saveBtn.innerHTML = `<span class="profile-btn-text">Save Profile</span>`
+                deleteBtn.innerHTML = `<span class="profile-btn-text">Delete Profile</span>`
+    
+                loadBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
+                saveBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
+                deleteBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">delete</span>`
+    
+                loadBtn.style.justifyContent = "space-between"
+                saveBtn.style.justifyContent = "space-between"
+                deleteBtn.style.justifyContent = "space-between"
+    
+            }, 1000)
+            
+        }else if(window.innerWidth < 1100){
+            if(loadBtn.classList.contains("no-google-icon")){
+                loadBtn.classList.add("material-symbols-outlined")
+                saveBtn.classList.add("material-symbols-outlined")
+                deleteBtn.classList.add("material-symbols-outlined")
         
-            loadBtn.classList.add("no-google-icon")
-            saveBtn.classList.add("no-google-icon")
+                loadBtn.classList.remove("no-google-icon")
+                saveBtn.classList.remove("no-google-icon")
+                deleteBtn.classList.remove("no-google-icon")
         
-            loadBtn.innerHTML = `<span class="profile-btn-text">Load Profile</span>`
-            saveBtn.innerHTML = `<span class="profile-btn-text">Save Profile</span>`
-        
-            loadBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
-            saveBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
-        
-            loadBtn.style.justifyContent = "space-between"
-            saveBtn.style.justifyContent = "space-between"
-        }else{
-            loadBtn.classList.add("material-symbols-outlined")
-            saveBtn.classList.add("material-symbols-outlined")
+                loadBtn.innerText = "person"
+                saveBtn.innerText = "save"
+                deleteBtn.innerText = "delete"
+                
+            }
 
-            loadBtn.classList.remove("no-google-icon")
-            saveBtn.classList.remove("no-google-icon")
-
-            loadBtn.innerText = "person"
-            saveBtn.innerText = "save"
-
-            // loadBtn.style = loadBtn.style
-            // saveBtn.style = loadBtn.style
-
-            loadBtn.style = loadBtn.style.transition = ""
-            saveBtn.style = loadBtn.style.transition = ""
+            loadBtn.style.transition = "width 1s, border-radius 2s"
+            saveBtn.style.transition = "width 1s, border-radius 0.5s"
+            deleteBtn.style.transition = "width 1s, border-radius 0.5s"
         }
     })
 
-// Button for load profiles modal
+    window.addEventListener("load", ()=>{
+        if(window.innerWidth >= 1100){
+            
+            loadBtn.classList.remove("material-symbols-outlined")
+            saveBtn.classList.remove("material-symbols-outlined")
+            deleteBtn.classList.remove("material-symbols-outlined")
+        
+            loadBtn.classList.add("no-google-icon")
+            saveBtn.classList.add("no-google-icon")
+            deleteBtn.classList.add("no-google-icon")
+        
+            loadBtn.innerHTML = `<span class="profile-btn-text">Load Profile</span>`
+            saveBtn.innerHTML = `<span class="profile-btn-text">Save Profile</span>`
+            deleteBtn.innerHTML = `<span class="profile-btn-text">Delete Profile</span>`
+        
+            loadBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
+            saveBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
+            deleteBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">delete</span>`
+        
+            loadBtn.style.justifyContent = "space-between"
+            saveBtn.style.justifyContent = "space-between"
+            deleteBtn.style.justifyContent = "space-between"
+
+        }else{
+
+            loadBtn.classList.add("material-symbols-outlined")
+            saveBtn.classList.add("material-symbols-outlined")
+            deleteBtn.classList.add("material-symbols-outlined")
+
+            loadBtn.classList.remove("no-google-icon")
+            saveBtn.classList.remove("no-google-icon")
+            deleteBtn.classList.remove("no-google-icon")
+
+            loadBtn.innerText = "person"
+            saveBtn.innerText = "save"
+            deleteBtn.innerText = "delete"
+
+        }
+    })
+
+// For load profiles modal
 loadBtn.addEventListener("click",(e)=>{
 
     const modalContainer = document.createElement("div")
@@ -91,7 +158,7 @@ loadBtn.addEventListener("click",(e)=>{
 
 })
 
-// For saving profiles
+// For saving profiles modal
 saveBtn.addEventListener("click",(e)=>{
     // If there are timers on the screen
     if(Object.values(timerObj).length){
@@ -118,6 +185,26 @@ saveBtn.addEventListener("click",(e)=>{
         handleBottomPopup("error", "There are no timers to save.")
     }
 
+})
+
+// For delete profiles modal
+deleteBtn.addEventListener("click", (e)=>{
+    const modalContainer = document.createElement("div")
+    modalContainer.classList.add("modal-background")
+    modalContainer.innerHTML = 
+    `
+    <div class="modal delete-modal">
+        <p class="modal-msg">Enter the profile name to delete:</p>
+        <input type="text" placeholder="Profile name" id="profile-delete-input"/>
+        <button id="profile-delete-btn" class="modal-btn">Delete</button>
+        <button id="profile-cancel-btn" class="modal-btn">Cancel</button>
+    </div>
+    `
+
+    scriptTag.before(modalContainer)
+    modalUp = true
+
+    document.getElementById("profile-delete-input").focus()
 })
 
 // For converting input overflow into hours/minutes
@@ -189,7 +276,7 @@ appHtml.addEventListener("keyup",(e)=>{
         
         if(e.target.getAttribute("id") === "profile-load-input"){
             const name = document.getElementById("profile-load-input").value
-            if(name.trim()){
+            if(name){
                 handleLoadProfile(name)
             }
         }
@@ -204,6 +291,13 @@ appHtml.addEventListener("keyup",(e)=>{
             }else{
                 handleSaveProfile(name)
 
+            }
+        }
+
+        if(e.target.getAttribute("id") === "profile-delete-input"){
+            const name = document.getElementById("profile-delete-input").value
+            if(name){
+                handleDeleteProfile(name)
             }
         }
 
@@ -252,6 +346,15 @@ appHtml.addEventListener("click", (e)=>{
 
         }
     }
+
+    if(e.target.getAttribute("id") === "profile-delete-btn"){
+        const name = document.getElementById("profile-delete-input").value
+
+        if(name){
+            handleDeleteProfile(name)
+        }
+    } 
+
     if(e.target.getAttribute("id") === "profile-cancel-btn"){
         handleCloseModal()
     }
@@ -307,9 +410,11 @@ function handleCreateTimer(){
     timerObj[id].defaultSec = defaultSec
     timerObj[id].timerName = timerName
     timerObj[id].timerId = id
+    timerObj[id].looping = false
 }
 
-function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, loading = false){
+function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, loading){
+    console.log(looping)
     return (`<div 
         data-timerNumber="${id}"
         data-default-hr="${defaultHr}"
@@ -329,16 +434,16 @@ function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, loading =
                 <span id="${id}-ms" class="text-small">000</span>
             </div>
             <div class="timers--timer-el--timer-options">
-                <button data-start="${id}" data-looping="false" class="start-btn ${id}">
-                    <span class="material-symbols-outlined" style="font-size: 2rem" data-start="${id}" data-looping="false" id="start-span-${id}">
+                <button data-start="${id}" data-looping="${looping}" class="start-btn ${id}">
+                    <span class="material-symbols-outlined" style="font-size: 2rem;" data-start="${id}" data-looping="${looping}" id="start-span-${id}">
                     arrow_right</span>
                 </button>
                 <button data-pause="${id}" class="pause-btn ${id}" disabled>
-                    <span class="material-symbols-outlined" style="font-size: 1.5rem" data-pause="${id}">
+                    <span class="material-symbols-outlined" style="font-size: 1.5rem;" data-pause="${id}">
                     pause</span>
                 </button>
                 <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
-                <button data-loop="${id}" class="loop-btn ${id}">
+                <button data-loop="${id}" class="loop-btn ${id} ${looping === "true" ? "loop" : ""}">
                     <span class="material-symbols-outlined" data-loop="${id}">
                     restart_alt</span>
                 </button>
@@ -654,56 +759,60 @@ function handleRenameSubmit(id){
 }
 
 function handleSaveProfile(name){
-    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
 
     const saveInput = document.getElementById("profile-save-input")
 
-    if(profiles[name]){
-        modalErrorMessage(saveInput,"This profile already exists. Please use the replace or merge button to update the profile.")
-        saveInput.value = name
-    }else{
-        // Create the property first to be able to store
-        if(!profiles[name]){
-            profiles[name] = {}
+    const profileName = ref(database, `${name}`)
+
+    get(profileName).then((snapshot) => {
+        if(snapshot.exists()){
+            saveInput.focus()
+            modalErrorMessage(saveInput,"This profile already exists. Please use the replace or merge button to update the profile.")
+        }else{
+            for(let id in timerObj){
+                const looping = document.querySelector(`.start-btn.${id}`).getAttribute("data-looping")
+                timerObj[id].looping = looping
+            }
+            set(profileName, timerObj)
+            handleCloseModal()
+            handleBottomPopup("success","Success! The profile has been saved.")
         }
-        for(let timer in timerObj){
-            profiles[name][timer] = timerObj[timer]
-        }
-        // profiles[name] = {
-        //     name: name,
-        //     timers: timerObj
-        // }
-        handleCloseModal()
-        handleBottomPopup("success","Success! The profile has been saved.")
-    }
-    localStorage.setItem("timers", JSON.stringify(profiles))
+    }).catch((err) => console.log(err))
 }
 
 function handleLoadProfile(name){
 
     const modalBackground = document.querySelector(".modal-background")
+
     const loadInput = document.getElementById("profile-load-input")
-    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
 
-    if(profiles[name]){
-        if(Object.values(timerObj).length > 0){
-            for(let item in timerObj){
-                delete timerObj[item]
+    const profileName = ref(database, `${name}`)
+
+    get(profileName).then((snapshot) => {
+        if(snapshot.exists()){
+            
+            const fireBaseProfile = snapshot.val()
+
+            if(Object.values(timerObj).length){
+                for(let id in timerObj){
+                    delete timerObj[id]
+                }
             }
-        }
-        for(let id in profiles[name]){
-            timerObj[id] = {...profiles[name][id]}
-        }
 
-        modalBackground.remove()
-        handleLoadProfileRender(name)
-    }else if(loadInput.value){
-        modalErrorMessage(loadInput, "Profile name not found.")
-    }
+            for(let id in fireBaseProfile){
+                timerObj[id] = fireBaseProfile[id]
+            }
 
+            modalBackground.remove()
+            handleLoadProfileRender()
+        }else{
+            console.log(loadInput)
+            modalErrorMessage(loadInput, "Profile name not found.")
+        }
+    })
 }
 
-function handleLoadProfileRender(name){
+function handleLoadProfileRender(){
 
     timersContainer.innerHTML = Object.values(timerObj).map(timer => {
         const id = timer.timerId
@@ -711,8 +820,9 @@ function handleLoadProfileRender(name){
         const hr = timer.defaultHr
         const min = timer.defaultMin
         const sec = timer.defaultSec
+        const loop = timer.looping
 
-        return ( timerRender(id, name, hr, min, sec, true))
+        return ( timerRender(id, name, hr, min, sec, loop, true))
     }).join("")
 
     // Remove the "loading" class
@@ -736,47 +846,73 @@ function modalErrorMessage(inputEl, message){
     document.querySelector(".modal").innerHTML += `
             <p class="not-found loading">${message}</p>
         `
-        inputEl.classList.toggle("input-error")
+    // Issue due to innerHTML += above ?
+    // inputEl.classList.toggle("input-error")
 
-        setTimeout(()=>{
+    setTimeout(()=>{
+        if(document.querySelector(".not-found")){
             document.querySelector(".not-found").remove()
-        }, 5000)
+        }
+    }, 5000)
 
-        setTimeout(()=>{
+    setTimeout(()=>{
+        if(document.querySelector(".not-found")){
             document.querySelector(".not-found").classList.toggle("deleting")
-        },4500)
+        }
+    },4500)
 }
 
 function handleReplaceButton(name){
-    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
 
     const saveInput = document.getElementById("profile-save-input")
 
-    if(profiles[name]){
-        profiles[name] = timerObj
-        localStorage.setItem("timers",JSON.stringify(profiles))
-        handleCloseModal()
-        handleBottomPopup("success","Success! The profile has been updated.")
-    }else{
-        modalErrorMessage(saveInput, "Profile name not found.")
-    }
+    const profileName = ref(database, `${name}`)
+
+    get(profileName).then((snapshot) => {
+        if(snapshot.exists()){
+            set(profileName, timerObj)
+            handleCloseModal()
+            handleBottomPopup("success","Success! The profile has been updated.")
+        }else{
+            modalErrorMessage(saveInput, "Profile name not found")
+        }
+    })
 }
 
 function handleMergeButton(name){
-    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
 
     const saveInput = document.getElementById("profile-save-input")
 
-    if(profiles[name]){
-        for(let timer in timerObj){
-            profiles[name][timer] = timerObj[timer]
+    const profileName = ref(database, `${name}`)
+
+    get(profileName).then((snapshot) => {
+        if(snapshot.exists()){
+            for(let id in timerObj){
+                const path = ref(database, `${name}/${id}`)
+                set(path, timerObj[id])
+            }
+            handleCloseModal()
+            handleBottomPopup("success","Success! The profile has been updated.")
+        }else{
+            modalErrorMessage(saveInput, "Profile name not found.")
         }
-        localStorage.setItem("timers", JSON.stringify(profiles))
-        handleCloseModal()
-        handleBottomPopup("success","Success! The profile has been updated.")
-    }else{
-        modalErrorMessage(saveInput, "Profile name not found.")
-    }
+    })
+}
+
+function handleDeleteProfile(name){
+    const profileName = ref(database, `${name}`)
+
+    const deleteInput = document.getElementById("delete-profile-input")
+
+    get(profileName).then((snapshot) => {
+        if(snapshot.exists()){
+            remove(profileName)
+            handleCloseModal()
+            handleBottomPopup("success","Success! The profile has been deleted.")
+        }else{
+            modalErrorMessage(deleteInput, "Profile name not found.")
+        }
+    })
 }
 
 function handleBottomPopup(type, message){
@@ -793,77 +929,3 @@ function handleBottomPopup(type, message){
         document.getElementById(`${type}-popup`).remove()
     }, 3000)
 }
-
-function profileButtonsDisplay(){
-    if(window.innerWidth >= 1100 && loadBtn.classList.contains("material-symbols-outlined")){
-        console.log("ran")
-        loadBtn.classList.remove("material-symbols-outlined")
-        saveBtn.classList.remove("material-symbols-outlined")
-
-        loadBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
-        saveBtn.innerHTML = `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
-
-        loadBtn.style.justifyContent = "end"
-        saveBtn.style.justifyContent = "end"
-
-        loadBtn.style.transiton = "width 1s"
-        saveBtn.style.transiton = "width 1s"
-
-        setTimeout(()=>{
-
-            loadBtn.classList.add("no-google-icon")
-            saveBtn.classList.add("no-google-icon")
-
-            loadBtn.innerHTML = `<span class="profile-btn-text">Load Profile</span>`
-            saveBtn.innerHTML = `<span class="profile-btn-text">Save Profile</span>`
-
-            loadBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">person</span>`
-            saveBtn.innerHTML += `<span class="material-symbols-outlined" style="min-width:32px;">save</span>`
-
-            loadBtn.style.justifyContent = "space-between"
-            saveBtn.style.justifyContent = "space-between"
-
-        }, 1000)
-        
-    }else if(window.innerWidth < 1100 && !loadBtn.classList.contains("material-symbols-outlined")){
-
-        loadBtn.classList.add("material-symbols-outlined")
-        saveBtn.classList.add("material-symbols-outlined")
-
-        loadBtn.classList.remove("no-google-icon")
-        saveBtn.classList.remove("no-google-icon")
-
-        loadBtn.innerText = "person"
-        saveBtn.innerText = "save"
-
-        loadBtn.style = loadBtn.style
-        saveBtn.style = saveBtn.style
-        
-        loadBtn.style.transition = "width 1s, border-radius 1s"
-        saveBtn.style.transition = "width 1s, border-radius 1s"
-    }
-}
-
-/**
- * TEST AREA
- */
-// document.getElementById("logObj").addEventListener("click", (e)=>{
-//     console.log(timerObj)
-// })
-
-// document.getElementById("logId").addEventListener("click", (e)=>{
-//     const localStorObj = JSON.parse(localStorage.getItem("timers"))
-//     console.log(localStorObj)
-// })
-
-// document.getElementById("clearLoc").addEventListener("click",()=>{
-//     localStorage.clear()
-
-//     // for(let timer in timerObj){
-//     //     delete timerObj[timer]
-//     // }
-// })
-
-// document.getElementById("logInterval").addEventListener("click", ()=>{
-//     console.log(intervalObj)
-// })

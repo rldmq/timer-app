@@ -69,3 +69,90 @@ loadTimers.addEventListener("click", ()=>{
 // saveCurrent.addEventListener("click",()=>{
 //     localStorage.setItem("timers", JSON.stringify(timerObj))
 // })
+
+function handleSaveProfile(name){
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    const saveInput = document.getElementById("profile-save-input")
+
+    if(profiles[name]){
+        modalErrorMessage(saveInput,"This profile already exists. Please use the replace or merge button to update the profile.")
+        saveInput.value = name
+    }else{
+
+        // Create the property first to be able to store
+        if(!profiles[name]){
+            profiles[name] = {}
+        }
+        for(let timer in timerObj){
+            profiles[name][timer] = timerObj[timer]
+        }
+        // profiles[name] = {
+        //     name: name,
+        //     timers: timerObj
+        // }
+        handleCloseModal()
+        handleBottomPopup("success","Success! The profile has been saved.")
+    }
+    localStorage.setItem("timers", JSON.stringify(profiles))
+}
+
+function handleLoadProfile(name){
+
+    const modalBackground = document.querySelector(".modal-background")
+
+    const loadInput = document.getElementById("profile-load-input")
+
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    if(profiles[name]){
+        if(Object.values(timerObj).length > 0){
+            for(let item in timerObj){
+                delete timerObj[item]
+            }
+        }
+
+        // Local storage
+        // for(let id in profiles[name]){
+        //     timerObj[id] = {...profiles[name][id]}
+        // }
+
+        modalBackground.remove()
+        handleLoadProfileRender()
+
+    }else if(loadInput.value){
+        modalErrorMessage(loadInput, "Profile name not found.")
+    }
+}
+
+function handleReplaceButton(name){
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    const saveInput = document.getElementById("profile-save-input")
+
+    if(profiles[name]){
+        profiles[name] = timerObj
+        localStorage.setItem("timers",JSON.stringify(profiles))
+        handleCloseModal()
+        handleBottomPopup("success","Success! The profile has been updated.")
+    }else{
+        modalErrorMessage(saveInput, "Profile name not found.")
+    }
+}
+
+function handleMergeButton(name){
+    const profiles = JSON.parse(localStorage.getItem("timers")) || {}
+
+    const saveInput = document.getElementById("profile-save-input")
+
+    if(profiles[name]){
+        for(let timer in timerObj){
+            profiles[name][timer] = timerObj[timer]
+        }
+        localStorage.setItem("timers", JSON.stringify(profiles))
+        handleCloseModal()
+        handleBottomPopup("success","Success! The profile has been updated.")
+    }else{
+        modalErrorMessage(saveInput, "Profile name not found.")
+    }
+}

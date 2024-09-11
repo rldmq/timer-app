@@ -13,3 +13,21 @@ export default function uniqueId(){
 
     return uid
 }
+
+// Import the functions you need from the SDKs you need
+// import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCIi8BSffIs9xf5sYsxC0L5kd2UZL7Kcn4",
+//   authDomain: "timer-app-f13e4.firebaseapp.com",
+//   projectId: "timer-app-f13e4",
+//   storageBucket: "timer-app-f13e4.appspot.com",
+//   messagingSenderId: "379327249931",
+//   appId: "1:379327249931:web:7e845a46aa40c0bb4bd10e"
+// };
+
+// Initialize Firebase
+// const app = initializeApp(firebaseConfig);
