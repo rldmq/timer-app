@@ -22,6 +22,20 @@ button:not(:disabled){
     cursor: pointer;
 }
 
+body{
+    padding: 2em;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: rgb(235, 235, 235);
+}
+
+main{
+    margin-top: 1em;
+    height: 100%;
+}
+
+
 /* 
     TYPOGRAPHY
 */
@@ -50,21 +64,8 @@ span.text-small{
 }
 
 /* 
-    APP
+    HEADER
 */
-body{
-    padding: 2em;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    background: rgb(235, 235, 235);
-}
-
-main{
-    margin-top: 1em;
-    height: 100%;
-}
-
 header{
     display: flex;
     justify-content: space-between;
@@ -77,9 +78,6 @@ header{
     gap: 0.5em;
 }
 
-/* 
-    HEADER
-*/
 .profiles-container{
     display: flex;
     flex-direction: column;
@@ -104,7 +102,7 @@ header{
 }
 
 /* 
-    OPTIONS
+    TIMER OPTIONS SECTION
 */
 
 /* For Chrome */
@@ -197,17 +195,36 @@ input.clock,
     grid-area: newbtn;
 }
 
-#new-btn:hover{
+#new-btn:hover,
+.global-btn:hover{
     background: lightgrey;
     font-weight: 600;
 }
 
-#new-btn:active{
+#new-btn:active,
+.global-btn:active{
     transform: translate(1px, 1px)
 }
 
 /* 
-    TIMERS
+    GLOBAL CONTROLS SECTION
+*/
+.global-controls{
+    margin-top: 1em;
+    display: flex;
+    gap: 1em;
+    justify-content: space-between;
+}
+
+.global-btn{
+    flex-grow: 1;
+    padding: 0.25em;
+    border-radius: 0.5em;
+    border: 1px solid grey;
+}
+
+/* 
+    TIMERS SECTION
 */
 .timers{
     margin-top: 1em;
@@ -325,18 +342,18 @@ input.clock,
     color: rgb(217, 72, 72);
 }
 
-.start-btn:disabled{
+.start-btn.active:disabled{
     background: rgb(191, 220, 191);
     border: 2px solid rgb(62, 122, 62);
 }
 
-.start-btn:disabled span{
+.start-btn.active:disabled span{
     color: rgb(62, 122, 62);
 }
 
 .start-btn:hover:not(:disabled) span{
     color: rgb(22, 183, 22);
-} 
+}
 
 /* 
     NOTIFICATIONS / MODALS
@@ -480,11 +497,15 @@ input.clock,
 */
 .deleting{
     opacity: 0;
-    transition: opacity 500ms ease-in;
+    transition: opacity 250ms ease-in;
 }
 
 .loading{
     animation: fadeIn 1s;
+}
+
+.alarm{
+    animation: 0.5s ease-in-out infinite alarmBackground;
 }
 
 @keyframes fadeIn{
@@ -508,6 +529,15 @@ input.clock,
     100%{
         opacity: 0;
         bottom: 5%;
+    }
+}
+
+@keyframes alarmBackground{
+    50%{
+        background: rgb(255, 177, 177);
+    }
+    100%{
+        background: rgb(241, 241, 241);
     }
 }
 
@@ -606,4 +636,12 @@ input.clock,
     .material-symbols-outlined{
         color: rgb(110, 110, 110);
     }
+}
+
+/* 
+    DRAG AND DROP TEST
+*/
+
+.dragging{
+    opacity: 0.25;
 }

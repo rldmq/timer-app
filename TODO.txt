@@ -1,29 +1,21 @@
--start all
--reset all
--pause all
--delete all
-
 -edit timer settings 
 
 -unsplash for backgrounds (very light)
 
 -add alarm sound option
 
-Issues:
--adding a new timer while existing timers are running pauses the existing timers (setInterval is still running)
+-different alarm sounds
 
-a combination of starting pausing and looping starts the timer when it shouldn't (when loop is toggled)
+Issues:
+-adding a new timer while existing timers are running pauses the existing timers (setInterval is still running) just add a clear interval for intervalobj on the handle start?
 
 Refactor:
 --
 
 did today:
--fixed profile button resizing (still issue with >1100 width)
--fixed hovering color issue for timers
--removed local storage and integrated firebase
--added delete profile functionality
--added loop to timerobj so that loop state is saved
-
+// drag and drop timers in place
+// password protect profiles
+// dark mode
 
 // there is an issue with adding a red box around the save and load modals.  it seems like because of the innerHTML +=, it is refreshing the page.  If you log the input element and try to select it, it says that it does not exist
 // add: inserting new timer resets other timers
@@ -32,5 +24,9 @@ did today:
 // visual queue for when timer reaches 0
 // -,+,.,e keys seem to work for the number input (low priority)
 
-Tests:
--save while timers are running
+// create draggable elements
+//create droppable elements
+
+// add draggable="true" to html element (in the js for us)
+//  create dragstart function (Refer to docs)
+

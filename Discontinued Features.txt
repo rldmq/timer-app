@@ -1,5 +1,7 @@
-1. Option setting how many timers to add (eg: add 5 new timers upon clicking the add button)
+1. Option setting how many timers to add (eg: add 5 new timers upon clicking the add button).
 
 2. Header and timer settings to be fixed at top of browser.
 
-3. Popup that asks "Overwrite the existing profile? Y/N"
+3. Popup that asks "Overwrite the existing profile? Y/N".
+
+4. Timer automatically resets when it reaches 0.

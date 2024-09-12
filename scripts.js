@@ -323,17 +323,16 @@ appHtml.addEventListener("keyup",(e)=>{
     }
 })
 
-// For renaming timers (click) && for handling modals
+// General event listener for clicks
 appHtml.addEventListener("click", (e)=>{
-    if(activeEl && !e.target.getAttribute("data-nameid")){
-        handleRenameSubmit(activeEl.getAttribute("data-rename"))
-    }
+
     if(e.target.getAttribute("id") === "profile-load-btn"){
         const name = document.getElementById("profile-load-input").value
         if(name.trim()){
             handleLoadProfile(name)
         }
     }
+
     if(e.target.getAttribute("id") === "profile-save-btn"){
         const saveInput = document.getElementById("profile-save-input")
 
@@ -358,16 +357,39 @@ appHtml.addEventListener("click", (e)=>{
     if(e.target.getAttribute("id") === "profile-cancel-btn"){
         handleCloseModal()
     }
+
     if(modalUp && e.target.getAttribute("class") === "modal-background"){
         handleCloseModal()
     }
+
     if(e.target.getAttribute("id") === "profile-replace-btn"){
         const name = document.getElementById("profile-save-input").value
         handleReplaceButton(name)
     }
+
     if(e.target.getAttribute("id") === "profile-merge-btn"){
         const name = document.getElementById("profile-save-input").value
         handleMergeButton(name)
+    }
+
+    if(e.target.getAttribute("id") === "start-all-btn"){
+        handleStartAll()
+    }
+
+    if(e.target.getAttribute("id") === "pause-all-btn"){
+        handlePauseAll()
+    }
+
+    if(e.target.getAttribute("id") === "reset-all-btn"){
+        handleResetAll()
+    }
+
+    if(e.target.getAttribute("id") === "delete-all-btn"){
+        handleDeleteAll()
+    }
+
+    if(activeEl && !e.target.getAttribute("data-nameid")){
+        handleRenameSubmit(activeEl.getAttribute("data-rename"))
     }
 })
 
@@ -393,7 +415,7 @@ function handleCreateTimer(){
 
     if((defaultHr + defaultMin + defaultSec) > 0){
 
-        timersContainer.innerHTML += timerRender(id, timerName, defaultHr, defaultMin, defaultSec)
+        timersContainer.innerHTML +=timerRender(id, timerName, defaultHr, defaultMin, defaultSec) 
 
         document.getElementById("hour").value = ""
         document.getElementById("minute").value = ""
@@ -411,17 +433,19 @@ function handleCreateTimer(){
     timerObj[id].timerName = timerName
     timerObj[id].timerId = id
     timerObj[id].looping = false
+
+    timerObj[id].position = document.querySelector(".timers").childNodes.length-1
 }
 
 function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, loading){
-    console.log(looping)
     return (`<div 
         data-timerNumber="${id}"
         data-default-hr="${defaultHr}"
         data-default-min="${defaultMin}"
         data-default-sec="${defaultSec}"
         data-name="${timerName}"
-        class="timers--timer-el-${id} timers--timer ${loading ? "loading" : ""}"
+        class="timers--timer-el-${id} timers--timer ${loading ? "loading" : ""} draggable"
+        draggable="true"
         >
             <span class="timers--timer-name timer-name-${id}" data-nameid=${id}>${timerName}</span>
             <div class="timers--timer-el--countdown-container">
@@ -434,8 +458,8 @@ function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, 
                 <span id="${id}-ms" class="text-small">000</span>
             </div>
             <div class="timers--timer-el--timer-options">
-                <button data-start="${id}" data-looping="${looping}" class="start-btn ${id}">
-                    <span class="material-symbols-outlined" style="font-size: 2rem;" data-start="${id}" data-looping="${looping}" id="start-span-${id}">
+                <button data-start="${id}" data-looping="${looping == "true" ? "true" : "false"}" class="start-btn ${id}">
+                    <span class="material-symbols-outlined" style="font-size: 2rem;" data-start="${id}" data-looping="${looping == "true" ? "true" : "false"}" id="start-span-${id}">
                     arrow_right</span>
                 </button>
                 <button data-pause="${id}" class="pause-btn ${id}" disabled>
@@ -454,6 +478,62 @@ function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, 
             </div>
         </div>`)
         // not sure if data-id is needed by all buttons
+}
+
+function calculateMs(hourEl, minEl, secEl, msEl){
+    return ((hourEl.innerHTML*3600000) + (minEl.innerHTML*60000) + (secEl.innerHTML*1000) + (msEl.innerHTML*1))
+}
+
+function getOriginalTime(container){
+    return ((container.getAttribute("data-default-hr")*3600000) + (container.getAttribute("data-default-min")*60000) + (container.getAttribute("data-default-sec")*1000))
+}
+
+function setTimerDisplay(totalMs, hourEl, minuteEl, secondEl, msEl){
+    const hrDisplay = Math.floor(totalMs/3600000)
+    
+    const minDisplay = Math.floor((totalMs - Math.floor(hrDisplay*3600000))/60000)
+    
+    const secDisplay = Math.floor((totalMs-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
+    
+    const msDisplay = totalMs - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
+    
+    hourEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
+    
+    minuteEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
+
+    secondEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
+    
+    msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay: msDisplay < 100 ? "0" + msDisplay : msDisplay
+}
+
+function handleStartAll(){
+    for(let id in timerObj){
+        if(!intervalObj[id]){
+            const looping = document.querySelector(`.loop-btn.${id}`).classList.contains("loop")
+    
+            handleStartButton(id, String(looping))
+        }
+    }
+}
+
+function handlePauseAll(){
+    for(let id in timerObj){
+        // Only run for active timers
+        if(document.querySelector(`.timers--timer-el-${id}`).classList.contains("active"))
+        handlePauseButton(id)
+    }
+}
+
+function handleResetAll(){
+    for(let id in timerObj){
+        handleResetButton(id)
+    }
+}
+
+function handleDeleteAll(){
+    for(let id in timerObj){
+        handleDeleteButton(id)
+    }
 }
 
 function handleStartButton(id, loop){
@@ -481,6 +561,7 @@ function handleStartButton(id, loop){
 
         // to help with looping
         timerContainer.classList.toggle("active")
+        startBtn.classList.toggle("active")
     }
     if(resetBtn.hasAttribute("disabled")){
         resetBtn.toggleAttribute("disabled")
@@ -488,23 +569,25 @@ function handleStartButton(id, loop){
     
     intervalObj[id] = setInterval(()=>{
 
+        // console.log(`running ${id}`)
+
         totalMillisec -= 10
 
         setTimerDisplay(totalMillisec, hrEl, minEl, secEl, msEl)
 
         if(totalMillisec === 0){
-            console.log(loop)
             if(loop === "true"){
                 totalMillisec = originalTime
+                handleTimerReachedZero(id,true)
+                // setTimeout(()=>{
+                //     timerContainer.classList.remove("alarm")
+                // }, 1000)
             }else{
+                handleTimerReachedZero(id)
                 clearInterval(intervalObj[id])
-
-                setTimerDisplay(originalTime, hrEl, minEl, secEl, msEl)
-
                 pauseBtn.toggleAttribute("disabled")
-                resetBtn.toggleAttribute("disabled")
-                startBtn.toggleAttribute("disabled")
                 timerContainer.classList.toggle("active")
+                startBtn.classList.toggle("active")
             }
         }
     },10)
@@ -517,50 +600,31 @@ function handleStartButton(id, loop){
 
         // to help with looping
         timerContainer.classList.toggle("active")
+        startBtn.classList.toggle("active")
     }
 
-}
-
-function calculateMs(hourEl, minEl, secEl, msEl){
-    return ((hourEl.innerHTML*3600000) + (minEl.innerHTML*60000) + (secEl.innerHTML*1000) + (msEl.innerHTML*1))
-}
-
-function getOriginalTime(container){
-    return ((container.getAttribute("data-default-hr")*3600000) + (container.getAttribute("data-default-min")*60000) + (container.getAttribute("data-default-sec")*1000))
-}
-
-function setTimerDisplay(totalMs, hourEl, minuteEl, secondEl, msEl){
-    const hrDisplay = Math.floor(totalMs/3600000)
-
-    const minDisplay = Math.floor((totalMs - Math.floor(hrDisplay*3600000))/60000)
-
-    const secDisplay = Math.floor((totalMs-Math.floor(hrDisplay*3600000)-Math.floor(minDisplay*60000))/1000)
-
-    const msDisplay = totalMs - Math.floor(hrDisplay*3600000) - Math.floor(minDisplay*60000) - Math.floor(secDisplay*1000)
-
-    hourEl.innerHTML = hrDisplay < 10 ? "0" + hrDisplay : hrDisplay
-
-    minuteEl.innerHTML = minDisplay < 10 ? "0" + minDisplay : minDisplay
-
-    secondEl.innerHTML = secDisplay < 10 ? "0" + secDisplay : secDisplay
-
-    msEl.innerHTML = msDisplay == 0 ? "00" + msDisplay: msDisplay < 100 ? "0" + msDisplay : msDisplay
 }
 
 function handlePauseButton(id){
 
     clearInterval(intervalObj[id])
+    delete intervalObj[id]
 
     const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
-
+    
     const pauseBtn = document.querySelector(`.pause-btn.${id}`)
-
+    
     const startBtn = document.querySelector(`.start-btn.${id}`)
+
+    const startBtnSpan = document.getElementById(`start-span-${id}`)
 
     pauseBtn.classList.toggle("paused")
     pauseBtn.toggleAttribute("disabled")
 
     startBtn.toggleAttribute("disabled")
+    startBtn.classList.remove("active")
+    startBtnSpan.classList.remove("active")
+
     timerContainer.classList.toggle("active")
 
 }
@@ -578,6 +642,10 @@ function handleResetButton(id){
     const resetEl = document.querySelector(`.timers--timer-el-${id}`)
 
     clearInterval(intervalObj[id])
+    delete intervalObj[id]
+
+    timerContainer.classList.remove("active")
+    startBtn.classList.remove("active")
 
     for(const child of resetEl.children){
         if(child.getAttribute("class") === "timers--timer-el--countdown-container"){
@@ -615,7 +683,11 @@ function handleResetButton(id){
     // Re-enable the start button
     if(startBtn.hasAttribute("disabled")){
         startBtn.toggleAttribute("disabled")
-        timerContainer.classList.toggle("active")
+    }
+
+    // Remove the alarm
+    if(timerContainer.classList.contains("alarm")){
+        timerContainer.classList.remove("alarm")
     }
 }
 
@@ -658,12 +730,13 @@ function handleLoopButton(id){
             setTimerDisplay(msLeft, hrEl, minEl, secEl, msEl)
 
             if(msLeft === 0){
+                handleTimerReachedZero(id, true)
                 msLeft = msOriginal
             }
         }, 10)
         loopBtn.classList.toggle("loop")
 
-    // If you want to stop the looping
+    // If you want to stop the looping while the timer is active
     }else if(timerContainer.classList.contains("active") && isLooping){
 
             startBtn.setAttribute("data-looping","false")
@@ -677,18 +750,20 @@ function handleLoopButton(id){
                 setTimerDisplay(msLeft, hrEl, minEl, secEl, msEl)
 
                 if(msLeft === 0){
+                    handleTimerReachedZero(id)
+                    startBtn.classList.remove("active")
                     clearInterval(intervalObj[id])
 
-                    setTimerDisplay(msOriginal, hrEl, minEl, secEl, msEl)
+                    // setTimerDisplay(msOriginal, hrEl, minEl, secEl, msEl)
 
-                    startBtn.toggleAttribute("disabled")
-                    pauseBtn.toggleAttribute("disabled")
-                    resetBtn.toggleAttribute("disabled")
+                    // startBtn.toggleAttribute("disabled")
+                    // pauseBtn.toggleAttribute("disabled")
+                    // resetBtn.toggleAttribute("disabled")
+                    timerContainer.classList.remove("active")
                 }
             }, 10)
             if(loopBtn.classList.contains("loop")){
-                loopBtn.classList.toggle("loop")
-                timerContainer.classList.toggle("active")
+                loopBtn.classList.remove("loop")
             }
     }
     // If the timer is not active on press
@@ -701,16 +776,25 @@ function handleLoopButton(id){
 
 function handleDeleteButton(id){
 
+    let childElCount = 0
+
     const deleteEl = document.querySelector(`.timers--timer-el-${id}`)
 
-    deleteEl.classList.toggle("deleting")
+    deleteEl.classList.add("deleting")
+
+    delete timerObj[id]
+    
+    clearInterval(intervalObj[id])
+    delete intervalObj[id]
+    
+    for(let item in timerObj){
+        timerObj[item].position = childElCount
+        childElCount++
+    }
 
     setTimeout(()=>{
         deleteEl.remove()
-        clearInterval(intervalObj[id])
-        delete intervalObj[id]
-        delete timerObj[id]
-    },650)
+    },300)
 }
 
 function handleRename(id){
@@ -758,28 +842,6 @@ function handleRenameSubmit(id){
 
 }
 
-function handleSaveProfile(name){
-
-    const saveInput = document.getElementById("profile-save-input")
-
-    const profileName = ref(database, `${name}`)
-
-    get(profileName).then((snapshot) => {
-        if(snapshot.exists()){
-            saveInput.focus()
-            modalErrorMessage(saveInput,"This profile already exists. Please use the replace or merge button to update the profile.")
-        }else{
-            for(let id in timerObj){
-                const looping = document.querySelector(`.start-btn.${id}`).getAttribute("data-looping")
-                timerObj[id].looping = looping
-            }
-            set(profileName, timerObj)
-            handleCloseModal()
-            handleBottomPopup("success","Success! The profile has been saved.")
-        }
-    }).catch((err) => console.log(err))
-}
-
 function handleLoadProfile(name){
 
     const modalBackground = document.querySelector(".modal-background")
@@ -812,54 +874,26 @@ function handleLoadProfile(name){
     })
 }
 
-function handleLoadProfileRender(){
+function handleSaveProfile(name){
 
-    timersContainer.innerHTML = Object.values(timerObj).map(timer => {
-        const id = timer.timerId
-        const name= timer.timerName
-        const hr = timer.defaultHr
-        const min = timer.defaultMin
-        const sec = timer.defaultSec
-        const loop = timer.looping
+    const saveInput = document.getElementById("profile-save-input")
 
-        return ( timerRender(id, name, hr, min, sec, loop, true))
-    }).join("")
+    const profileName = ref(database, `${name}`)
 
-    // Remove the "loading" class
-    setTimeout(()=>{
-        const loadingEls = document.querySelectorAll(".loading")
-                    
-        for(let element of loadingEls){
-            element.classList.toggle("loading")
+    get(profileName).then((snapshot) => {
+        if(snapshot.exists()){
+            saveInput.focus()
+            modalErrorMessage(saveInput,"This profile already exists. Please use the replace or merge button to update the profile.")
+        }else{
+            for(let id in timerObj){
+                const looping = document.querySelector(`.start-btn.${id}`).getAttribute("data-looping")
+                timerObj[id].looping = looping
+            }
+            set(profileName, timerObj)
+            handleCloseModal()
+            handleBottomPopup("success","Success! The profile has been saved.")
         }
-        
-    }, 1500)
-}
-
-function handleCloseModal(){
-    document.querySelector(".modal-background").remove()
-    modalUp = false
-}
-
-function modalErrorMessage(inputEl, message){
-
-    document.querySelector(".modal").innerHTML += `
-            <p class="not-found loading">${message}</p>
-        `
-    // Issue due to innerHTML += above ?
-    // inputEl.classList.toggle("input-error")
-
-    setTimeout(()=>{
-        if(document.querySelector(".not-found")){
-            document.querySelector(".not-found").remove()
-        }
-    }, 5000)
-
-    setTimeout(()=>{
-        if(document.querySelector(".not-found")){
-            document.querySelector(".not-found").classList.toggle("deleting")
-        }
-    },4500)
+    }).catch((err) => console.log(err))
 }
 
 function handleReplaceButton(name){
@@ -915,6 +949,55 @@ function handleDeleteProfile(name){
     })
 }
 
+function handleLoadProfileRender(){
+    timersContainer.innerHTML = Object.values(timerObj).sort((a,b) => a.position - b.position).map(timer => {
+        const id = timer.timerId
+        const name= timer.timerName
+        const hr = timer.defaultHr
+        const min = timer.defaultMin
+        const sec = timer.defaultSec
+        const loop = timer.looping
+
+        return ( timerRender(id, name, hr, min, sec, loop, true))
+    }).join("")
+
+    // Remove the "loading" class
+    setTimeout(()=>{
+        const loadingEls = document.querySelectorAll(".loading")
+                    
+        for(let element of loadingEls){
+            element.classList.toggle("loading")
+        }
+        
+    }, 1500)
+}
+
+function handleCloseModal(){
+    document.querySelector(".modal-background").remove()
+    modalUp = false
+}
+
+function modalErrorMessage(inputEl, message){
+
+    document.querySelector(".modal").innerHTML += `
+            <p class="not-found loading">${message}</p>
+        `
+    // Issue due to innerHTML += above ?
+    // inputEl.classList.toggle("input-error")
+
+    setTimeout(()=>{
+        if(document.querySelector(".not-found")){
+            document.querySelector(".not-found").remove()
+        }
+    }, 5000)
+
+    setTimeout(()=>{
+        if(document.querySelector(".not-found")){
+            document.querySelector(".not-found").classList.toggle("deleting")
+        }
+    },4500)
+}
+
 function handleBottomPopup(type, message){
     setTimeout(()=>{
         const popupEl = document.createElement("div")
@@ -928,4 +1011,83 @@ function handleBottomPopup(type, message){
     setTimeout(()=>{
         document.getElementById(`${type}-popup`).remove()
     }, 3000)
+}
+
+function handleTimerReachedZero(id, loop){
+    const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
+
+    timerContainer.classList.add("alarm")
+
+    if(loop){
+        setTimeout(()=>{
+            timerContainer.classList.remove("alarm")
+        }, 1000)
+    }
+}
+
+
+document.getElementById("log-timerObj").addEventListener("click", ()=>{
+    console.log(timerObj, document.querySelector(".timers").childNodes.length)
+})
+
+// appHtml.addEventListener("mouseover",(e)=>{
+//     if(e.target.getAttribute("data-delete")){
+//         console.log(e.target.getAttribute("data-delete"))
+//     }
+// })
+
+// appHtml.addEventListener("click",(e)=>{
+//     if(e.target.getAttribute("data-delete")){
+//         console.log(e.target.getAttribute("data-delete"))
+//     }
+// })
+
+appHtml.addEventListener("click", ()=>{
+    const draggables = document.querySelectorAll(".draggable")
+
+    draggables.forEach(item => {
+        item.addEventListener("dragstart", () => {
+            item.classList.add("dragging")
+        })
+
+        item.addEventListener("dragend", ()=>{
+            item.classList.remove("dragging")
+        })
+    })
+
+})
+
+timersContainer.addEventListener("dragover", (e)=>{
+    e.preventDefault()
+    const afterElement = getDragAfterElement(timersContainer, e.clientX, e.clientY)
+
+    console.log(afterElement.getAttribute("data-timernumber"))
+
+    const draggable = document.querySelector(".dragging")
+    // timersContainer.appendChild(draggable)
+})
+
+function getDragAfterElement(container, x, y){
+    const draggableElements = [...container.querySelectorAll(".draggable:not(.dragging)")]
+
+    return draggableElements.reduce((closest, child)=>{
+        const box = child.getBoundingClientRect()
+
+        const offsetX = x - (box.left - box.width/2)
+        const offsetY = y - (box.top - box.height/2)
+
+        // console.log(offsetX, offsetY)
+        // console.log(box, child, offsetX, offsetY)
+
+        if((offsetX > 0 && offsetY < 0) && (offsetX < closest.offsetX && offsetY > closest.offsetY) ){
+            return {
+                offsetX: offsetX,
+                offsetY: offsetY,
+                element: child,
+            }
+        }else{
+            return closest
+        }
+
+    },{offsetX: Number.POSITIVE_INFINITY, offsetY: Number.NEGATIVE_INFINITY}).element
 }

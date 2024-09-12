@@ -156,3 +156,68 @@ function handleMergeButton(name){
         modalErrorMessage(saveInput, "Profile name not found.")
     }
 }
+
+function handleStartButton(id, loop){
+
+    const startBtn = document.querySelector(`.start-btn.${id}`)
+
+    const pauseBtn = document.querySelector(`.pause-btn.${id}`)
+
+    const resetBtn = document.querySelector(`.reset-btn.${id}`)
+
+    const timerContainer = document.querySelector(`.timers--timer-el-${id}`)
+
+    const hrEl = document.getElementById(`${id}-hr`)
+    const minEl = document.getElementById(`${id}-min`)
+    const secEl = document.getElementById(`${id}-sec`)
+    const msEl = document.getElementById(`${id}-ms`)
+
+    let totalMillisec = calculateMs(hrEl, minEl, secEl, msEl)
+
+    const originalTime = getOriginalTime(timerContainer)
+
+    if(pauseBtn.hasAttribute("disabled") && !pauseBtn.classList.contains("paused")){
+        pauseBtn.toggleAttribute("disabled")
+        startBtn.toggleAttribute("disabled")
+
+        // to help with looping
+        timerContainer.classList.toggle("active")
+    }
+    if(resetBtn.hasAttribute("disabled")){
+        resetBtn.toggleAttribute("disabled")
+    }
+    
+    intervalObj[id] = setInterval(()=>{
+
+        totalMillisec -= 10
+
+        setTimerDisplay(totalMillisec, hrEl, minEl, secEl, msEl)
+
+        if(totalMillisec === 0){
+            handleTimerReachedZero(id)
+            if(loop === "true"){
+                totalMillisec = originalTime
+            }else{
+                clearInterval(intervalObj[id])
+
+                setTimerDisplay(originalTime, hrEl, minEl, secEl, msEl)
+
+                pauseBtn.toggleAttribute("disabled")
+                resetBtn.toggleAttribute("disabled")
+                startBtn.toggleAttribute("disabled")
+                timerContainer.classList.toggle("active")
+            }
+        }
+    },10)
+
+    // Handle styling of pause button when unpausing
+    if(pauseBtn.classList.contains("paused")){
+        pauseBtn.classList.toggle("paused")
+        pauseBtn.toggleAttribute("disabled")
+        startBtn.toggleAttribute("disabled")
+
+        // to help with looping
+        timerContainer.classList.toggle("active")
+    }
+
+}
