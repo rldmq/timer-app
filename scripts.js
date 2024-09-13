@@ -458,8 +458,8 @@ function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, 
                 <span id="${id}-ms" class="text-small">000</span>
             </div>
             <div class="timers--timer-el--timer-options">
-                <button data-start="${id}" data-looping="${looping == "true" ? "true" : "false"}" class="start-btn ${id}">
-                    <span class="material-symbols-outlined" style="font-size: 2rem;" data-start="${id}" data-looping="${looping == "true" ? "true" : "false"}" id="start-span-${id}">
+                <button data-start="${id}" data-looping="${looping == true ? "true" : "false"}" class="start-btn ${id}">
+                    <span class="material-symbols-outlined" style="font-size: 2rem;" data-start="${id}" data-looping="${looping == true ? "true" : "false"}" id="start-span-${id}">
                     arrow_right</span>
                 </button>
                 <button data-pause="${id}" class="pause-btn ${id}" disabled>
@@ -467,7 +467,7 @@ function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, 
                     pause</span>
                 </button>
                 <button data-reset="${id}" class="reset-btn ${id}" disabled>Reset</button>
-                <button data-loop="${id}" class="loop-btn ${id} ${looping === "true" ? "loop" : ""}">
+                <button data-loop="${id}" class="loop-btn ${id} ${looping === true ? "loop" : ""}">
                     <span class="material-symbols-outlined" data-loop="${id}">
                     restart_alt</span>
                 </button>
@@ -569,8 +569,6 @@ function handleStartButton(id, loop){
     
     intervalObj[id] = setInterval(()=>{
 
-        // console.log(`running ${id}`)
-
         totalMillisec -= 10
 
         setTimerDisplay(totalMillisec, hrEl, minEl, secEl, msEl)
@@ -579,9 +577,6 @@ function handleStartButton(id, loop){
             if(loop === "true"){
                 totalMillisec = originalTime
                 handleTimerReachedZero(id,true)
-                // setTimeout(()=>{
-                //     timerContainer.classList.remove("alarm")
-                // }, 1000)
             }else{
                 handleTimerReachedZero(id)
                 clearInterval(intervalObj[id])
@@ -772,11 +767,11 @@ function handleLoopButton(id){
         startBtnSpan.setAttribute("data-looping", String(!isLooping))
         loopBtn.classList.toggle("loop")
     }
+
+    updateTimerLoop(loopBtn, id)
 }
 
 function handleDeleteButton(id){
-
-    let childElCount = 0
 
     const deleteEl = document.querySelector(`.timers--timer-el-${id}`)
 
@@ -787,13 +782,9 @@ function handleDeleteButton(id){
     clearInterval(intervalObj[id])
     delete intervalObj[id]
     
-    for(let item in timerObj){
-        timerObj[item].position = childElCount
-        childElCount++
-    }
-
     setTimeout(()=>{
         deleteEl.remove()
+        updateTimerPositions()
     },300)
 }
 
@@ -868,7 +859,6 @@ function handleLoadProfile(name){
             modalBackground.remove()
             handleLoadProfileRender()
         }else{
-            console.log(loadInput)
             modalErrorMessage(loadInput, "Profile name not found.")
         }
     })
@@ -921,12 +911,25 @@ function handleMergeButton(name){
 
     get(profileName).then((snapshot) => {
         if(snapshot.exists()){
+            let idConflict = false
+
+            // Check if any existing timers are being merged in
             for(let id in timerObj){
-                const path = ref(database, `${name}/${id}`)
-                set(path, timerObj[id])
+                if(snapshot.val()[id]){
+                    idConflict = true
+                }
             }
-            handleCloseModal()
-            handleBottomPopup("success","Success! The profile has been updated.")
+
+            if(idConflict === false){
+                for(let id in timerObj){
+                    const path = ref(database, `${name}/${id}`)
+                    set(path, timerObj[id])
+                }
+                handleCloseModal()
+                handleBottomPopup("success","Success! The profile has been updated.")
+            }else{
+                modalErrorMessage(saveInput, "There is a conflict with an existing timer.  Please use the replace button if any existing timers need to be updated.")
+            }
         }else{
             modalErrorMessage(saveInput, "Profile name not found.")
         }
@@ -1025,69 +1028,71 @@ function handleTimerReachedZero(id, loop){
     }
 }
 
+function updateTimerPositions(){
+    const timerElsArr = [...document.querySelectorAll(".timers--timer")]
 
-document.getElementById("log-timerObj").addEventListener("click", ()=>{
-    console.log(timerObj, document.querySelector(".timers").childNodes.length)
+    const timerPositions = timerElsArr.map((e) => e.getAttribute("data-timernumber"))
+
+    for(let id in timerObj){
+        timerObj[id].position = timerPositions.indexOf(id)
+    }
+}
+
+function updateTimerLoop(loopBtnEl, id){
+    if(loopBtnEl.classList.contains("loop")){
+        timerObj[id].looping = true
+    }else{
+        timerObj[id].looping = false
+    }
+}
+
+/**
+ * DRAG AND DROP
+ */
+timersContainer.addEventListener("dragstart",(e)=>{
+    if(e.target.getAttribute("data-timernumber")){
+        e.target.classList.add("dragging")
+    }
 })
 
-// appHtml.addEventListener("mouseover",(e)=>{
-//     if(e.target.getAttribute("data-delete")){
-//         console.log(e.target.getAttribute("data-delete"))
-//     }
-// })
-
-// appHtml.addEventListener("click",(e)=>{
-//     if(e.target.getAttribute("data-delete")){
-//         console.log(e.target.getAttribute("data-delete"))
-//     }
-// })
-
-appHtml.addEventListener("click", ()=>{
-    const draggables = document.querySelectorAll(".draggable")
-
-    draggables.forEach(item => {
-        item.addEventListener("dragstart", () => {
-            item.classList.add("dragging")
-        })
-
-        item.addEventListener("dragend", ()=>{
-            item.classList.remove("dragging")
-        })
-    })
-
+timersContainer.addEventListener("dragend", (e) =>{
+    if(e.target.getAttribute("data-timernumber")){
+        e.target.classList.remove("dragging")
+    }
 })
 
 timersContainer.addEventListener("dragover", (e)=>{
     e.preventDefault()
-    const afterElement = getDragAfterElement(timersContainer, e.clientX, e.clientY)
 
-    console.log(afterElement.getAttribute("data-timernumber"))
+    const draggableEl = document.querySelector(".dragging")
+    const draggableId = draggableEl.getAttribute("data-timernumber")
+    const targetId = e.target.getAttribute("data-timernumber")
 
-    const draggable = document.querySelector(".dragging")
-    // timersContainer.appendChild(draggable)
-})
+    if(targetId && targetId !== draggableId){
 
-function getDragAfterElement(container, x, y){
-    const draggableElements = [...container.querySelectorAll(".draggable:not(.dragging)")]
+        const targetPosition = timerObj[targetId].position
+        const draggablePosition = timerObj[draggableId].position
 
-    return draggableElements.reduce((closest, child)=>{
-        const box = child.getBoundingClientRect()
+        if(draggablePosition < targetPosition){
+            timersContainer.insertBefore(e.target, draggableEl)
 
-        const offsetX = x - (box.left - box.width/2)
-        const offsetY = y - (box.top - box.height/2)
-
-        // console.log(offsetX, offsetY)
-        // console.log(box, child, offsetX, offsetY)
-
-        if((offsetX > 0 && offsetY < 0) && (offsetX < closest.offsetX && offsetY > closest.offsetY) ){
-            return {
-                offsetX: offsetX,
-                offsetY: offsetY,
-                element: child,
-            }
         }else{
-            return closest
+            timersContainer.insertBefore(draggableEl, e.target)
         }
 
-    },{offsetX: Number.POSITIVE_INFINITY, offsetY: Number.NEGATIVE_INFINITY}).element
-}
+        updateTimerPositions()
+
+    }
+})
+
+/**
+ * TESTING AREA
+ */
+document.getElementById("log-timerObj").addEventListener("click", ()=>{
+
+    // const timerArr = Object.values(timerObj).map((e) => String([e.timerId, e.position]))
+
+    // console.log(timerArr, document.querySelector(".timers").childNodes.length)
+
+    console.log(timerObj)
+})

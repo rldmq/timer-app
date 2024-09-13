@@ -221,3 +221,51 @@ function handleStartButton(id, loop){
     }
 
 }
+
+timersContainer.addEventListener("dragover", (e)=>{
+    e.preventDefault()
+
+    const draggable = document.querySelector(".dragging")
+
+    const afterElement = getDragAfterElement(timersContainer, e.clientX, e.clientY)
+
+    console.log(afterElement.getAttribute("data-timernumber"), e.clientX, e.clientY)
+
+    timersContainer.appendChild(draggable)
+
+    console.log(draggable.getAttribute("data-timernumber"))
+
+    if(afterElement !== draggable){
+        timersContainer.insertBefore(draggable, afterElement)
+        console.log("worked", afterElement.getAttribute("data-timernumber"))
+    }
+})
+
+
+function getDragAfterElement(container, x, y){
+    // const draggableElements = [...container.querySelectorAll(".draggable:not(.dragging)")]
+    const draggableElements = [...container.querySelectorAll(".draggable")]
+
+    return draggableElements.reduce((closest, child)=>{
+        const box = child.getBoundingClientRect()
+
+        const offsetX = x - (box.right - box.width/2)
+        const offsetY = y - (box.top + box.height/2)
+
+        // console.log(offsetX, offsetY)
+        // console.log(box, child.getAttribute("data-timernumber"), offsetX, offsetY)
+
+        if((offsetX < 0 && offsetY < 0) && (offsetX > closest.offsetX && offsetY > closest.offsetY) ){
+            // console.log(offsetX, offsetY)
+            // console.log(child.getAttribute("data-timernumber"))
+            return {
+                offsetX: offsetX,
+                offsetY: offsetY,
+                element: child,
+            }
+        }else{
+            return closest
+        }
+
+    },{offsetX: Number.NEGATIVE_INFINITY, offsetY: Number.NEGATIVE_INFINITY}).element
+}

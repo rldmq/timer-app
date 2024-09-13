@@ -2,8 +2,6 @@
 
 -unsplash for backgrounds (very light)
 
--add alarm sound option
-
 -different alarm sounds
 
 Issues:
@@ -13,9 +11,13 @@ Refactor:
 --
 
 did today:
-// drag and drop timers in place
+-drag and drop
+-bug fix on looping persistence
+
 // password protect profiles
 // dark mode
+// sound
+// issue with merge since positions are not updated and end up overlapping
 
 // there is an issue with adding a red box around the save and load modals.  it seems like because of the innerHTML +=, it is refreshing the page.  If you log the input element and try to select it, it says that it does not exist
 // add: inserting new timer resets other timers

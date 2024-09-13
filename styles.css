@@ -242,6 +242,7 @@ input.clock,
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    cursor: grab;
 }
 
 .timers--timer.active{
@@ -485,11 +486,13 @@ input.clock,
 .success-popup{
     color: rgb(11, 123, 11);
     border: 2px solid rgb(11, 123, 11);
+    box-shadow: 0 0 1em 0.1em grey;
 }
 
 .error-popup{
     color: rgb(200, 14, 14);
     border: 2px solid rgb(200, 14, 14);
+    box-shadow: 0 0 1em 0.1em grey;
 }
 
 /* 
@@ -639,9 +642,10 @@ input.clock,
 }
 
 /* 
-    DRAG AND DROP TEST
+    DRAG AND DROP
 */
 
 .dragging{
     opacity: 0.25;
+    cursor: dragging;
 }
