@@ -9,26 +9,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 
         <!-- Google Symbols -->
-        <!-- Load -->
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-        <!-- Save -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-        <!-- Delete -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-        <!-- Play -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-        <!-- Pause -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-        <!-- Loop -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-
-        <!-- Delete -->
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
         <!-- Favicon -->
         <link rel="apple-touch-icon" sizes="180x180" href="./assets/favicon/apple-touch-icon.png">
@@ -57,7 +38,6 @@
             <section class="options">
                 <h2 class="options--title">Timer Settings</h2>
                 <div class="options--timer-settings">
-
                     <div class="options--timer-settings--display countdown-segment-1">
                         <label for="hour" class="label">
                             <input id="hour" type="number" placeholder="hh" min="0" class="clock options--timer-settings--display--clock-hour"/>
@@ -76,8 +56,32 @@
                         </label>
                     </div>
                     <label for="timer-name" class="label" id="timer-name-label">
-                        <input id="timer-name" type="text" placeholder="Timer Name: Eat a singular chip timer, Time for crab..." maxlength="30"/>
+                        <input id="timer-name" type="text" placeholder="(Optional) Enter a name for your timer: Time for crab, Eat a singular chip 1 second loop, etc." maxlength="30"/>
                     </label>
+                    <div class="options--audio">
+                        <label for="track-select" class="track-select-label">
+                            Select Alarm
+                            <select id="track-select" name="track-select">
+                                <!-- <option value="">--- Set Alarm Track ---</option> -->
+                                <option value="">No Audio</option>
+                                <option value="calm.mp3">Calm</option>
+                                <option value="digital.wav">Digital</option>
+                                <option value="retro-game.wav">Retro Game</option>
+                                <option value="subtle-ring.wav">Subtle Ring</option>
+                                <option value="traditional-01.mp3">Traditional 01</option>
+                                <option value="traditional-02.mp3">Traditional 02</option>
+                            </select>
+                        </label>
+                        <div class="track-preview">
+                            <p>Preview Alarm</p>
+                            <button id="audio-preview-play" class="material-symbols-outlined" style="font-variation-settings: 'wght' 700;">arrow_right</button>
+                            <button id="audio-preview-stop" class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">stop</button>
+                            <label for="preview-volume" id="preview-volume-label" class="material-symbols-outlined">
+                                volume_up
+                                <input id="preview-volume" name="preview-volume" type="range" min="0" max="1" step="0.01"/>
+                            </label>
+                        </div>
+                    </div>
                     <button id="new-btn">Create</button>
                 </div>
             </section>
@@ -88,7 +92,8 @@
                 <button id="delete-all-btn" class="global-btn">Delete All</button>
             </section>
             <section class="timers"></section>
-            <button id="log-timerObj">log timer obj</button>
+            <!-- Testing Area -->
+            <!-- <button id="log-timerObj">log timer obj</button> -->
         </main>
         <script src="./scripts.js" type="module"></script>
     </body>

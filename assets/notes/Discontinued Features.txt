@@ -5,3 +5,5 @@
 3. Modal addition that asks "Overwrite the existing profile? Y/N".
 
 4. Timer automatically resets when it reaches 0.
+
+5. Ability to change the alarm track of a timer after creation.

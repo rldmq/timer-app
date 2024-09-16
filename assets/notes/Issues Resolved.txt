@@ -44,5 +44,10 @@ What is confusing to me is that the modal gets removed even though it is after t
 
 The issue was adding the SPAN for the google icons.  The data-attributes had to be added to the google icon for the start button as well.
 ------------------------------------------------------------
-6. --
+6. Adjusting the volume on the individual timers is triggering the drag events on the timerContainer.
+
+This issue was fixed by adding a mousedown event that disables the draggable attribute of the timer and also a mouseup event that re-enables the draggable attribute of the timer.
+------------------------------------------------------------
+------------------------------------------------------------
+7. --
 ------------------------------------------------------------

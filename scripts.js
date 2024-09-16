@@ -8,6 +8,9 @@ import uniqueId from "./utils.js"
 // CLEAR INTERVAL OBJECT
 const intervalObj = {}
 
+// AUDIO OBJECT
+const audioObj ={}
+
 // VARIABLES
 const firebaseConfig = {
     databaseURL: "https://timer-app-f13e4-default-rtdb.firebaseio.com/",
@@ -25,6 +28,8 @@ const newTimerBtn = document.getElementById("new-btn")
 const loadBtn = document.getElementById("load-btn")
 const saveBtn = document.getElementById("save-btn")
 const deleteBtn = document.getElementById("delete-btn")
+const previewVolume = document.getElementById("preview-volume")
+const previewVolumeSymbol = document.getElementById("preview-volume-label")
 const scriptTag = document.getElementsByTagName("script")[0]
 
 const timersContainer = document.querySelector(".timers")
@@ -391,11 +396,84 @@ appHtml.addEventListener("click", (e)=>{
     if(activeEl && !e.target.getAttribute("data-nameid")){
         handleRenameSubmit(activeEl.getAttribute("data-rename"))
     }
+
+    if(e.target.getAttribute("id") === "audio-preview-play"){
+        handleAudioPreviewPlay()
+    }
+
+    if(e.target.getAttribute("id") === "audio-preview-stop"){
+        handleAudioPreviewStop()
+    }
+
+    if(e.target.getAttribute("id") === "preview-volume-label"){
+        handleVolumeMute("preview")
+    }
+
+    if(e.target.getAttribute("data-mute")){
+        handleVolumeMute(e.target.getAttribute("data-mute"))
+    }
+})
+
+// For handling audio volume changes
+appHtml.addEventListener("input",(e)=>{
+
+    // For setting the volume of the alarm track
+    if(e.target.getAttribute("id") === "preview-volume" && audioObj["preview"]){
+        audioObj["preview"].volume = previewVolume.value
+    }
+
+    // For changing the symbol of the volume preview
+    if(e.target.getAttribute("id") === "preview-volume"){
+        if(previewVolume.value == 0){
+            previewVolumeSymbol.childNodes[0].nodeValue = "no_sound"
+        }else{
+            previewVolumeSymbol.childNodes[0].nodeValue = "volume_up"
+        }
+    }
+
+    // For setting the volume of a timer alarm
+    if(e.target.getAttribute("data-alarmvolume") && audioObj[e.target.getAttribute("data-alarmvolume")]){
+        const id = e.target.getAttribute("data-alarmvolume")
+
+        const timerVolume = document.getElementById(`${id}-volume`)
+
+        audioObj[id].volume = timerVolume.value
+    }
+
+    // For changing the symbol on a timer
+    if(e.target.getAttribute("data-alarmvolume")){
+        const id = e.target.getAttribute("data-alarmvolume")
+
+        const timerVolume = document.getElementById(`${id}-volume`)
+        
+        const volumeSymbol = document.getElementById(`${id}-mute`)
+
+        if(timerVolume.value == 0){
+            volumeSymbol.innerText = "no_sound"
+        }else{
+            volumeSymbol.innerText = "volume_up"
+        }
+        timerObj[id].alarmVolume = timerVolume.value
+    }
+})
+
+// For disabling timer dragging when adjusting timer volume
+timersContainer.addEventListener("mousedown",(e)=>{
+    if(e.target.getAttribute("data-alarmvolume")){
+        disableDrag(e.target.getAttribute("data-alarmvolume"))
+    }
+})
+
+timersContainer.addEventListener("mouseup",(e)=>{
+    if(e.target.getAttribute("data-alarmvolume")){
+        reEnableDrag(e.target.getAttribute("data-alarmvolume"))
+    }
 })
 
 
 // FUNCTIONS
 function handleCreateTimer(){
+
     const id = uniqueId()
 
     // If the input is blank, use 0.  If the input is less than 10, append "0".  Else, use the input value
@@ -413,9 +491,13 @@ function handleCreateTimer(){
 
     const timerName = document.getElementById("timer-name").value === "" ? id : document.getElementById("timer-name").value
 
+    const alarmTrack = document.getElementById("track-select").value
+
+    const alarmTrackName = document.getElementById("track-select").options[document.getElementById("track-select").selectedIndex].text
+
     if((defaultHr + defaultMin + defaultSec) > 0){
 
-        timersContainer.innerHTML +=timerRender(id, timerName, defaultHr, defaultMin, defaultSec) 
+        timersContainer.innerHTML +=timerRender(id, timerName, defaultHr, defaultMin, defaultSec, alarmTrack, alarmTrackName, previewVolume.value) 
 
         document.getElementById("hour").value = ""
         document.getElementById("minute").value = ""
@@ -433,11 +515,14 @@ function handleCreateTimer(){
     timerObj[id].timerName = timerName
     timerObj[id].timerId = id
     timerObj[id].looping = false
+    timerObj[id].alarmTrack = alarmTrack
+    timerObj[id].alarmTrackName = alarmTrackName
+    timerObj[id].alarmVolume = previewVolume.value
 
     timerObj[id].position = document.querySelector(".timers").childNodes.length-1
 }
 
-function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, loading){
+function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, alarmTrack, alarmTrackName,alarmVolume, looping, loading){
     return (`<div 
         data-timerNumber="${id}"
         data-default-hr="${defaultHr}"
@@ -476,6 +561,15 @@ function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, looping, 
                     delete_forever</span>
                 </button>
             </div>
+            ${alarmTrack ?
+                `<div class="timers--timer-el--timer-alarm">
+                    <label for="${timerName}-volume" data-mute="${id}"
+                    id="${id}-mute" class="material-symbols-outlined audio-mute">${alarmVolume > 0 ? "volume_up" : "no_sound"}
+                    </label>
+                    <input type="range" min="0" max="1" step="0.01" value="${alarmVolume}" id="${id}-volume" data-alarmvolume="${id}">
+                    <p>${alarmTrackName}</p>
+                </div>`
+            : ""}
         </div>`)
         // not sure if data-id is needed by all buttons
 }
@@ -684,6 +778,11 @@ function handleResetButton(id){
     if(timerContainer.classList.contains("alarm")){
         timerContainer.classList.remove("alarm")
     }
+
+    if(audioObj[id]){
+        audioObj[id].src = ""
+    }
+
 }
 
 function handleLoopButton(id){
@@ -959,9 +1058,12 @@ function handleLoadProfileRender(){
         const hr = timer.defaultHr
         const min = timer.defaultMin
         const sec = timer.defaultSec
+        const track = timer.alarmTrack
+        const trackName = timer.alarmTrackName
+        const volume = timer.alarmVolume
         const loop = timer.looping
 
-        return ( timerRender(id, name, hr, min, sec, loop, true))
+        return ( timerRender(id, name, hr, min, sec, track, trackName, volume, loop, true))
     }).join("")
 
     // Remove the "loading" class
@@ -1021,13 +1123,27 @@ function handleTimerReachedZero(id, loop){
 
     timerContainer.classList.add("alarm")
 
+    const alarmTrack = timerObj[id].alarmTrack
+
+    if(!audioObj[id] && alarmTrack){
+        audioObj[id] = new Audio(`./assets/audio/${alarmTrack}`)
+    }else if(alarmTrack){
+        audioObj[id].src = `./assets/audio/${alarmTrack}`
+    }
+
+    audioObj[id].play()
+    audioObj[id].loop = true
+    audioObj[id].volume = timerObj[id].alarmVolume
+
     if(loop){
         setTimeout(()=>{
             timerContainer.classList.remove("alarm")
+            audioObj[id].src = ""
         }, 1000)
     }
 }
 
+// TIMER POSITIONS NEED WORK FOR MERGED PROFILES
 function updateTimerPositions(){
     const timerElsArr = [...document.querySelectorAll(".timers--timer")]
 
@@ -1046,12 +1162,60 @@ function updateTimerLoop(loopBtnEl, id){
     }
 }
 
+function handleVolumeMute(id){
+    if(id === "preview"){
+        previewVolume.value = 0
+        if(audioObj["preview"]){
+            audioObj["preview"].volume = 0
+        }
+        previewVolumeSymbol.childNodes[0].nodeValue = "no_sound"
+    }else if(id){
+        const timerVolume = document.getElementById(`${id}-volume`)
+        timerVolume.value = 0
+        if(audioObj[id]){
+            audioObj[id].volume = 0
+        }
+        document.getElementById(`${id}-mute`).innerText = "no_sound"
+    }
+}
+
+function handleAudioPreviewStop(){
+    audioObj["preview"].src = ""
+}
+
+function handleAudioPreviewPlay(){
+
+    const track = document.getElementById("track-select").value
+
+    if(!audioObj["preview"]){
+        audioObj["preview"] = new Audio(`./assets/audio/${track}`)
+    }else{
+        audioObj["preview"].src = `./assets/audio/${track}`
+    }
+
+    if(track !== ""){
+        audioObj["preview"].play()
+        audioObj["preview"].loop = true
+        audioObj["preview"].volume = previewVolume.value
+    }
+}
+
+function disableDrag(id){
+    document.querySelector(`.timers--timer-el-${id}`).setAttribute("draggable",false)
+}
+
+function reEnableDrag(id){
+    document.querySelector(`.timers--timer-el-${id}`).setAttribute("draggable",true)
+}
+
 /**
  * DRAG AND DROP
  */
 timersContainer.addEventListener("dragstart",(e)=>{
     if(e.target.getAttribute("data-timernumber")){
         e.target.classList.add("dragging")
+
+        // document.querySelector(".dragging").style.cursor = "grabbing"
     }
 })
 
@@ -1088,11 +1252,11 @@ timersContainer.addEventListener("dragover", (e)=>{
 /**
  * TESTING AREA
  */
-document.getElementById("log-timerObj").addEventListener("click", ()=>{
+// document.getElementById("log-timerObj").addEventListener("click", ()=>{
 
-    // const timerArr = Object.values(timerObj).map((e) => String([e.timerId, e.position]))
+//     const timerArr = Object.values(timerObj).map((e) => String([e.timerId, e.position]))
 
-    // console.log(timerArr, document.querySelector(".timers").childNodes.length)
+//     console.log(timerArr, document.querySelector(".timers").childNodes.length)
 
-    console.log(timerObj)
-})
+//     console.log(timerObj)
+// })

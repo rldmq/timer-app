@@ -1,0 +1,19 @@
+Issues:
+-adding a new timer while existing timers are running pauses the existing timers (setInterval is still running) just add a clear interval for intervalobj on the handle start?
+-Issue with merging timers due to positions being combined (eg: there will be two timers with a position of 1)
+-there is an issue with adding a red box around the save and load modals.  it seems like because of the innerHTML +=, it is refreshing the page.  If you log the input element and try to select it, it says that it does not exist
+- (-,+,.,e) keys seem to work for the number input (low priority)
+-modal inputs are being reset when profiles are not found
+-modal should decativate everything on the page
+
+Pending Features:
+-password protect profiles
+-dark mode
+-visual for drag and drop (area to grab and area to drop to)
+-use grabbing cursor when grabbing
+-edit timer settings (hh mm ss)
+-unsplash for backgrounds (very light)
+-inserting new timer resets other timers
+
+Refactor:
+-create functions for eventlisteners

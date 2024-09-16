@@ -121,6 +121,7 @@ input[type=number]{
     grid-template-areas: 
         "newname newname newname newname newname"
         "seg1 seg2 seg3 seg4 seg5"
+        "audio audio audio audio audio"
         "newbtn newbtn newbtn newbtn newbtn";
     row-gap: 0.5em;
 }
@@ -185,6 +186,72 @@ input.clock,
     padding: 0.5em;
     border-radius: 0.5em;
     border: 1px solid lightgrey;
+}
+
+.options--audio{
+    grid-area: audio;
+    display: flex;
+    column-gap: 1.25em;
+}
+
+.track-select-label{
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+#track-select{
+    padding: 0.5em;
+    height: 60%;
+    width: 100%;
+    border-radius: 0.5em;
+    border: 1px solid lightgrey;
+}
+
+.track-preview{
+    display: grid;
+    grid-template-areas: 
+    "preview-text preview-text"
+    "preview-play preview-stop"
+    "preview-volume preview-volume";
+    gap: 0.25em;
+}
+
+.track-preview > p{
+    grid-area: preview-text;
+}
+
+#audio-preview-stop{
+    grid-area: preview-stop;
+    border-radius: 0.25em;
+    border: 1px solid grey;
+}
+
+#audio-preview-stop:hover{
+    color: rgb(217, 72, 72);
+}
+
+#audio-preview-play{
+    flex-shrink: preview-play;
+    border-radius: 0.25em;
+    border: 1px solid grey;
+}
+
+#audio-preview-play:hover{
+    color: rgb(22, 183, 22);
+}
+
+#audio-preview-stop:active,
+#audio-preview-play:active{
+    transform: translate(1px, 1px)
+}
+
+#preview-volume-label{
+    grid-area: preview-volume;
+    display: flex;
+    gap: 0.25em;
+    cursor: pointer;
 }
 
 #new-btn{
@@ -355,6 +422,33 @@ input.clock,
 .start-btn:hover:not(:disabled) span{
     color: rgb(22, 183, 22);
 }
+
+/* 
+    TIMER ALARM
+*/
+.timers--timer-el--timer-alarm{
+    margin-top: 1em;
+    display: flex;
+    gap: 0.5em;
+}
+
+.audio-mute{
+    cursor: pointer;
+}
+
+.timers--timer-el--timer-alarm input[type=range]{
+
+}
+
+.timers--timer-el--timer-alarm input[type=range]::-webkit-slider-runnable-track{
+
+}
+
+.timers--timer-el--timer-alarm input[type=range]::-moz-range-track{
+
+}
+
+
 
 /* 
     NOTIFICATIONS / MODALS
@@ -594,6 +688,7 @@ input.clock,
         grid-template-areas: 
             "seg1 seg2 seg3 seg4 seg5    "
             "newname newname newname newname newname"
+            "audio audio audio audio audio"
             "newbtn newbtn newbtn newbtn newbtn";
     }
 
@@ -647,5 +742,5 @@ input.clock,
 
 .dragging{
     opacity: 0.25;
-    cursor: dragging;
+    /* cursor: grabbing; */
 }
