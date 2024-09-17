@@ -48,6 +48,5 @@ The issue was adding the SPAN for the google icons.  The data-attributes had to 
 
 This issue was fixed by adding a mousedown event that disables the draggable attribute of the timer and also a mouseup event that re-enables the draggable attribute of the timer.
 ------------------------------------------------------------
-------------------------------------------------------------
 7. --
 ------------------------------------------------------------

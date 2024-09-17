@@ -19,6 +19,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 const database = getDatabase(app)
 
+let theme = localStorage.getItem("theme") || "dark"
+const themeBtn = document.getElementById("theme-btn")
+const githubBtn = document.getElementById("github-btn")
+const linkedinBtn = document.getElementById("linkedin-btn")
+
 const timerObj = {}
 
 let modalUp = false
@@ -99,9 +104,15 @@ let activeElVal
             saveBtn.style.transition = "width 1s, border-radius 0.5s"
             deleteBtn.style.transition = "width 1s, border-radius 0.5s"
         }
+
+        setLogo(theme, window.innerWidth)
     })
 
     window.addEventListener("load", ()=>{
+
+        themeOnLoad()
+        setLogo(theme, window.innerWidth)
+
         if(window.innerWidth >= 1100){
             
             loadBtn.classList.remove("material-symbols-outlined")
@@ -159,6 +170,16 @@ loadBtn.addEventListener("click",(e)=>{
     scriptTag.before(modalContainer)
     modalUp = true
 
+    if(theme === "dark"){
+        modalContainer.classList.add("dark")
+        
+        const modalEls = modalContainer.getElementsByTagName("*")
+
+        for(let el of modalEls){
+            el.classList.add("dark")
+        }
+    }
+
     document.getElementById("profile-load-input").focus()
 
 })
@@ -170,6 +191,7 @@ saveBtn.addEventListener("click",(e)=>{
 
         const modalContainer = document.createElement("div")
         modalContainer.classList.add("modal-background")
+        
         modalContainer.innerHTML = 
         `
         <div class="modal save-modal">
@@ -185,6 +207,16 @@ saveBtn.addEventListener("click",(e)=>{
         scriptTag.before(modalContainer)
         modalUp = true
 
+        if(theme === "dark"){
+            modalContainer.classList.add("dark")
+            
+            const modalEls = modalContainer.getElementsByTagName("*")
+            
+            for(let el of modalEls){
+                el.classList.add("dark")
+            }
+        }
+
         document.getElementById("profile-save-input").focus()
     }else{
         handleBottomPopup("error", "There are no timers to save.")
@@ -196,6 +228,7 @@ saveBtn.addEventListener("click",(e)=>{
 deleteBtn.addEventListener("click", (e)=>{
     const modalContainer = document.createElement("div")
     modalContainer.classList.add("modal-background")
+
     modalContainer.innerHTML = 
     `
     <div class="modal delete-modal">
@@ -208,6 +241,16 @@ deleteBtn.addEventListener("click", (e)=>{
 
     scriptTag.before(modalContainer)
     modalUp = true
+
+    if(theme === "dark"){
+        modalContainer.classList.add("dark")
+        
+        const modalEls = modalContainer.getElementsByTagName("*")
+        
+        for(let el of modalEls){
+            el.classList.add("dark")
+        }
+    }
 
     document.getElementById("profile-delete-input").focus()
 })
@@ -363,7 +406,7 @@ appHtml.addEventListener("click", (e)=>{
         handleCloseModal()
     }
 
-    if(modalUp && e.target.getAttribute("class") === "modal-background"){
+    if(modalUp && e.target.classList.contains("modal-background")){
         handleCloseModal()
     }
 
@@ -470,6 +513,48 @@ timersContainer.addEventListener("mouseup",(e)=>{
     }
 })
 
+// For drag and drop
+timersContainer.addEventListener("dragstart",(e)=>{
+    if(e.target.getAttribute("data-timernumber")){
+        e.target.classList.add("dragging")
+    }
+})
+
+timersContainer.addEventListener("dragend", (e) =>{
+    if(e.target.getAttribute("data-timernumber")){
+        e.target.classList.remove("dragging")
+    }
+})
+
+timersContainer.addEventListener("dragover", (e)=>{
+    e.preventDefault()
+    e.dataTransfer.dropEffect = "move"
+
+    const draggableEl = document.querySelector(".dragging")
+    const draggableId = draggableEl.getAttribute("data-timernumber")
+    const targetId = e.target.getAttribute("data-timernumber")
+
+    if(targetId && targetId !== draggableId){
+
+        const targetPosition = timerObj[targetId].position
+        const draggablePosition = timerObj[draggableId].position
+
+        if(draggablePosition < targetPosition){
+            timersContainer.insertBefore(e.target, draggableEl)
+
+        }else{
+            timersContainer.insertBefore(draggableEl, e.target)
+        }
+
+        updateTimerPositions()
+
+    }
+})
+
+// For changing themes
+themeBtn.addEventListener("click", ()=>{
+    themeChange()
+})
 
 // FUNCTIONS
 function handleCreateTimer(){
@@ -497,7 +582,18 @@ function handleCreateTimer(){
 
     if((defaultHr + defaultMin + defaultSec) > 0){
 
-        timersContainer.innerHTML +=timerRender(id, timerName, defaultHr, defaultMin, defaultSec, alarmTrack, alarmTrackName, previewVolume.value) 
+        timersContainer.innerHTML +=timerRender(id, timerName, defaultHr, defaultMin, defaultSec, alarmTrack, alarmTrackName, previewVolume.value)
+
+        // For some reason, timerRender stopped setting the reset button to disabled
+        // timersContainer.querySelector(`.reset-btn.${id}`).addAttribute("disabled")
+        
+        if(theme === "dark"){
+            const els = timersContainer.getElementsByTagName("*")
+            
+            for(let el of els){
+                el.classList.add("dark")
+            }
+        }
 
         document.getElementById("hour").value = ""
         document.getElementById("minute").value = ""
@@ -520,6 +616,14 @@ function handleCreateTimer(){
     timerObj[id].alarmVolume = previewVolume.value
 
     timerObj[id].position = document.querySelector(".timers").childNodes.length-1
+
+    const children = timersContainer.childNodes
+    for(let child of children){
+        if(child.classList.contains("active")){
+            const childId = child.getAttribute("data-timernumber")
+            handleResetButton(childId)
+        }
+    }
 }
 
 function timerRender(id, timerName, defaultHr, defaultMin, defaultSec, alarmTrack, alarmTrackName,alarmVolume, looping, loading){
@@ -691,11 +795,9 @@ function handleStartButton(id, loop){
         timerContainer.classList.toggle("active")
         startBtn.classList.toggle("active")
     }
-
 }
 
 function handlePauseButton(id){
-
     clearInterval(intervalObj[id])
     delete intervalObj[id]
 
@@ -715,7 +817,6 @@ function handlePauseButton(id){
     startBtnSpan.classList.remove("active")
 
     timerContainer.classList.toggle("active")
-
 }
 
 function handleResetButton(id){
@@ -737,7 +838,7 @@ function handleResetButton(id){
     startBtn.classList.remove("active")
 
     for(const child of resetEl.children){
-        if(child.getAttribute("class") === "timers--timer-el--countdown-container"){
+        if(child.classList.contains("timers--timer-el--countdown-container")){
             for(const c of child.children){
                 if(c.getAttribute("id") === `${id}-hr`){
                     c.innerHTML = resetEl.getAttribute("data-default-hr")
@@ -899,7 +1000,8 @@ function handleRename(id){
         renameInput.setAttribute("data-nameid", `${id}`)
         renameInput.setAttribute("class",`rename-input-${id}`)
         renameInput.setAttribute("class","timers--timer-name")
-    
+        
+
         timerEl.replaceChild(renameInput,refNode)
     
         renameInput.focus()
@@ -922,6 +1024,10 @@ function handleRenameSubmit(id){
     updatedName.setAttribute("class",`timers--timer-name timer-name-${id}`)
     updatedName.setAttribute("data-nameid",`${id}`)
     updatedName.textContent = newName
+
+    if(theme === "dark"){
+        updatedName.classList.add("dark")
+    }
 
     timerEl.replaceChild(updatedName, refNode)
     timerEl.setAttribute("data-name", newName)
@@ -1075,6 +1181,14 @@ function handleLoadProfileRender(){
         }
         
     }, 1500)
+
+    if(theme === "dark"){
+        const els = timersContainer.getElementsByTagName("*")
+        
+        for(let el of els){
+            el.classList.add("dark")
+        }
+    }
 }
 
 function handleCloseModal(){
@@ -1108,6 +1222,11 @@ function handleBottomPopup(type, message){
         const popupEl = document.createElement("div")
         popupEl.classList.add(`${type}-popup`)
         popupEl.classList.add("popup")
+
+        if(theme === "dark"){
+            popupEl.classList.add("dark")
+        }
+
         popupEl.setAttribute("id",`${type}-popup`)
         popupEl.innerText = `${message}`
         scriptTag.before(popupEl)
@@ -1131,9 +1250,11 @@ function handleTimerReachedZero(id, loop){
         audioObj[id].src = `./assets/audio/${alarmTrack}`
     }
 
-    audioObj[id].play()
-    audioObj[id].loop = true
-    audioObj[id].volume = timerObj[id].alarmVolume
+    if(alarmTrack){
+        audioObj[id].play()
+        audioObj[id].loop = true
+        audioObj[id].volume = timerObj[id].alarmVolume
+    }
 
     if(loop){
         setTimeout(()=>{
@@ -1208,46 +1329,118 @@ function reEnableDrag(id){
     document.querySelector(`.timers--timer-el-${id}`).setAttribute("draggable",true)
 }
 
-/**
- * DRAG AND DROP
- */
-timersContainer.addEventListener("dragstart",(e)=>{
-    if(e.target.getAttribute("data-timernumber")){
-        e.target.classList.add("dragging")
+function themeOnLoad(){
+    const allEls = document.getElementsByTagName("*")
+    const logo = document.getElementById("logo")
 
-        // document.querySelector(".dragging").style.cursor = "grabbing"
-    }
-})
+    if(theme === "light"){
 
-timersContainer.addEventListener("dragend", (e) =>{
-    if(e.target.getAttribute("data-timernumber")){
-        e.target.classList.remove("dragging")
-    }
-})
+        themeBtn.textContent = "🌛"
+        themeBtn.style.backgroundColor = "rgb(33,33,33)"
+        logo.src = "./assets/images/logo_light.jpg"
 
-timersContainer.addEventListener("dragover", (e)=>{
-    e.preventDefault()
-
-    const draggableEl = document.querySelector(".dragging")
-    const draggableId = draggableEl.getAttribute("data-timernumber")
-    const targetId = e.target.getAttribute("data-timernumber")
-
-    if(targetId && targetId !== draggableId){
-
-        const targetPosition = timerObj[targetId].position
-        const draggablePosition = timerObj[draggableId].position
-
-        if(draggablePosition < targetPosition){
-            timersContainer.insertBefore(e.target, draggableEl)
-
-        }else{
-            timersContainer.insertBefore(draggableEl, e.target)
+        for(let el of allEls){
+            el.classList.remove("dark")
         }
 
-        updateTimerPositions()
+        linkedinBtn.innerHTML = "<img src='./assets/images/icons8-linkedin-32.png' width='18'/>"
+        linkedinBtn.style.backgroundColor = "rgb(33,33,33)"
+
+        githubBtn.innerHTML = "<img src='./assets/images/github-mark-white.png' width='23'/>"
+        githubBtn.style.backgroundColor = "rgb(33,33,33)"
+
+        localStorage.setItem("theme","light")
+
+    }else{
+
+        themeBtn.textContent = "🌞"
+        themeBtn.style.backgroundColor = "rgb(235,235,235)"
+        logo.src = "./assets/images/logo_dark.jpg"
+
+        for(let el of allEls){
+            el.classList.add("dark")
+        }
+
+        linkedinBtn.innerHTML = "<img src='./assets/images/icons8-linkedin-30.png' width='23'/>"
+        linkedinBtn.style.backgroundColor = "rgb(235,235,235)"
+        
+        githubBtn.innerHTML = "<img src='./assets/images/github-mark.png' width='23'/>"
+        githubBtn.style.backgroundColor = "rgb(235,235,235)"
+
+        localStorage.setItem("theme","dark")
+    }
+}
+
+function themeChange(){
+    const allEls = document.getElementsByTagName("*")
+    const logo = document.getElementById("logo")
+
+    if(theme === "light"){
+        theme = "dark"
+
+        themeBtn.textContent = "🌞"
+        themeBtn.style.backgroundColor = "rgb(235,235,235)"
+
+        for(let el of allEls){
+            el.classList.add("dark")
+        }
+
+        linkedinBtn.innerHTML = "<img src='./assets/images/icons8-linkedin-30.png' width='23'/>"
+        linkedinBtn.style.backgroundColor = "rgb(235,235,235)"
+        
+        githubBtn.innerHTML = "<img src='./assets/images/github-mark.png' width='23'/>"
+        githubBtn.style.backgroundColor = "rgb(235,235,235)"
+
+        localStorage.setItem("theme","dark")
+
+    }else{
+        theme = "light"
+
+        themeBtn.textContent = "🌛"
+        themeBtn.style.backgroundColor = "rgb(33,33,33)"
+
+        for(let el of allEls){
+            el.classList.remove("dark")
+        }
+
+        linkedinBtn.innerHTML = "<img src='./assets/images/icons8-linkedin-32.png' width='18'/>"
+        linkedinBtn.style.backgroundColor = "rgb(33,33,33)"
+
+        githubBtn.innerHTML = "<img src='./assets/images/github-mark-white.png' width='23'/>"
+        githubBtn.style.backgroundColor = "rgb(33,33,33)"
+
+        localStorage.setItem("theme","light")
 
     }
-})
+    setLogo(theme,window.innerWidth)
+}
+
+function setLogo(theme, width){
+    const logo = document.getElementById("logo")
+    const appDesc = document.querySelector(".app-description")
+
+    if(width < 415){
+        if(theme === "dark"){
+            logo.src = "./assets/images/logo_dark_small.jpg"
+            logo.width = "70"
+            appDesc.innerText = "Timer App"
+        }else{
+            logo.src = "./assets/images/logo_light_small.jpg"
+            logo.width = "70"
+            appDesc.innerText = "Timer App"
+        }
+    }else{
+        if(theme === "dark"){
+            logo.src = "./assets/images/logo_dark.jpg"
+            logo.width = "300"
+            appDesc.innerText = "Create and run multiple timers in a single app."
+        }else{
+            logo.src = "./assets/images/logo_light.jpg"
+            logo.width = "300"
+            appDesc.innerText = "Create and run multiple timers in a single app."
+        }
+    }
+}
 
 /**
  * TESTING AREA

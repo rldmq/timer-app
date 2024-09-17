@@ -7,3 +7,5 @@
 4. Timer automatically resets when it reaches 0.
 
 5. Ability to change the alarm track of a timer after creation.
+
+6. Change the cursor to "grabbing" when actively grabbing an element. (This isn't really a discontinued feature, but seems more of a limitation since the cursor on dragover seems like it can't be changed)

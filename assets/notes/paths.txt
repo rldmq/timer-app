@@ -1,9 +1,0 @@
-1. Start: timer ends
-2. Start > Reset: timer resets
-3. Loop > Start: timer loops
-4. Loop > Start > Reset: timer resets
-5. Loop > Start > Loop: timer ends
-6. Loop > Start > Loop > Reset: timer Resets
-7. Start > Loop: timer loops
-8. Start > Loop > Reset: timer resets (with loop enabled)
-9. Disable Loop > Start > Loop: timer loops

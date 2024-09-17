@@ -35,6 +35,118 @@ main{
     height: 100%;
 }
 
+/* 
+    DARK MODE
+*/
+body.dark{
+    background: rgb(33,33,33);
+}
+
+h2.dark,
+p.dark,
+label.dark,
+input.dark,
+select.dark,
+.clock.dark,
+.clock-divider.dark,
+.timers--timer-el--countdown-container span.dark,
+.timers--timer-name.dark,
+span.text-small.dark{
+    color: #ececec;
+}
+
+input.dark,
+.clock-divider.dark,
+select.dark{
+    background: rgb(50, 50, 50);
+}
+
+input.dark::placeholder{
+    color: rgb(170, 170, 170);
+}
+
+button.dark{
+    background: rgb(33,33,33);
+    color: #ececec;
+}
+
+button .material-symbols-outlined.dark{
+    color: #ececec;
+}
+
+button.dark:hover,
+#load-btn.dark:hover,
+#save-btn.dark:hover,
+#delete-btn.dark:hover,
+#new-btn.dark:hover,
+.start-btn.dark:hover:not(:disabled),
+.pause-btn.dark:hover:not(:disabled),
+.reset-btn.dark:hover:not(:disabled),
+.loop-btn.dark:hover:not(:disabled),
+.delete-btn.dark:hover:not(:disabled){
+    background: rgb(60, 60, 60);
+}
+
+.pause-btn.dark:disabled,
+.reset-btn.dark:disabled{
+    opacity: 15%;
+}
+
+.pause-btn.paused.dark:disabled{
+    background: rgb(255, 185, 185);
+    border: 2px solid rgb(217, 72, 72);
+    opacity: 100%;
+}
+
+.pause-btn.paused.dark:disabled span{
+    color: rgb(217, 72, 72);
+    opacity: 100%;
+}
+
+.pause-btn.dark:disabled:hover,
+.reset-btn.dark:disabled:hover{
+    background: rgb(33,33,33);
+}
+
+.timers--timer.dark{
+    background: rgb(33,33,33);
+}
+
+.timers--timer.active.dark{
+    background: rgb(60,60,60);
+}
+
+.alarm.dark{
+    animation: 0.5s ease-in-out infinite alarmBackgroundDark;
+}
+
+    /* MODALS (DARK MODE) */
+
+.modal-background.dark{
+    background: rgba(22, 22, 22, 0.5)
+}
+
+.modal.dark{
+    background: rgb(33,33,33);
+    box-shadow: 0 0 1em 0.25em rgb(16, 16, 16);
+}
+
+    /* POPUPS (DARKMODE) */
+    .popup.dark{
+        background: rgb(10,10,10);
+    }
+    
+    .success-popup.dark{
+        color: rgb(0, 255, 0);
+        border: 2px solid rgb(0, 255, 0);
+        box-shadow: 0 0 1em 0.25em rgb(16, 16, 16);
+    }
+    
+    .error-popup.dark{
+        color: rgb(255, 0, 0);
+        border: 2px solid rgb(255, 0, 0);
+        box-shadow: 0 0 1em 0.25em rgb(16, 16, 16);
+    }
 
 /* 
     TYPOGRAPHY
@@ -436,7 +548,7 @@ input.clock,
     cursor: pointer;
 }
 
-.timers--timer-el--timer-alarm input[type=range]{
+/* .timers--timer-el--timer-alarm input[type=range]{
 
 }
 
@@ -446,7 +558,7 @@ input.clock,
 
 .timers--timer-el--timer-alarm input[type=range]::-moz-range-track{
 
-}
+} */
 
 
 
@@ -590,6 +702,47 @@ input.clock,
 }
 
 /* 
+    THEME, GITHUB, LINKEDIN BUTTONS
+*/
+#theme-btn,
+#github-btn,
+#linkedin-btn{
+    position: fixed;
+    right: 1em;
+    padding: 0.25em;
+    cursor: pointer;
+    border-radius: 10%;
+    width: 30px;
+    height: 30px;
+    border: none;
+    text-align: center;
+}
+
+#theme-btn{
+    bottom: 1em;
+    background: rgb(33,33,33);
+}
+
+#github-btn{
+    bottom: 3.5em;
+}
+
+#linkedin-btn{
+    bottom: 6em;
+}
+
+#linkedin-btn img,
+#github-btn img{
+    vertical-align: middle;
+}
+
+#theme-btn:active,
+#linkedin-btn:active,
+#github-btn:active{
+    transform: translate(1px, 1px);
+}
+
+/* 
     ANIMATIONS
 */
 .deleting{
@@ -638,6 +791,15 @@ input.clock,
     }
 }
 
+@keyframes alarmBackgroundDark{
+    50%{
+        background: rgb(79, 35, 35);
+    }
+    100%{
+        background: rgb(60, 60, 60);
+    }
+}
+
 /*
     MEDIA QUERIES
     Common screen resolutions:
@@ -665,9 +827,9 @@ input.clock,
         display: none;
     }
 
-    .app-description{
+    /* .app-description{
         display: none;
-    }
+    } */
 
     .app-title{
         font-size: 3rem;
@@ -697,6 +859,27 @@ input.clock,
     }
 }
 
+/* Theme , LinkedIn and Github buttons */
+@media screen and (max-width: 1150px){
+    #theme-btn,
+    #github-btn,
+    #linkedin-btn{
+        right: 0.1em;
+        width: 25px;
+        /* height: 20px; */
+    }
+
+    #github-btn img,
+    #linkedin-btn img{
+        width: 15px;
+    }
+
+    #theme-btn{
+        font-size: 0.75rem;
+        bottom: 1.25em;
+    }
+}
+
 /* Desktop: 1024px and above */
 @media screen and (min-width: 1024px){
 
@@ -706,7 +889,7 @@ input.clock,
 /* Custom: Really wide viewport */
 @media screen and (min-width: 1100px){
     body{
-        width: 1100px;
+        width: 1050px;
         align-items: center;
         margin: auto;
     }
@@ -739,8 +922,7 @@ input.clock,
 /* 
     DRAG AND DROP
 */
-
 .dragging{
     opacity: 0.25;
-    /* cursor: grabbing; */
+    background: rgb(164, 164, 164);
 }
